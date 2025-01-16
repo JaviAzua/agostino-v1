@@ -17,7 +17,7 @@ This repository is dedicated to the development of a portfolio website for **Gon
 - **Form Handling**: [React Hook Form](https://react-hook-form.com/)
 - **Data Validation**: [Zod](https://zod.dev/)
 
-## Contact
+## Contact Gonzalo
 
 For any inquiries or feedback, reach out via email:
 
