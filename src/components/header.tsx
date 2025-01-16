@@ -101,7 +101,7 @@ function Header({ scrollContainer }: Props) {
               About
             </motion.li>
           </Link>
-          <Link href="projects">
+          <Link href="#projects">
             <motion.li
               whileHover={{ scale: 1.1 }}
               transition={{
@@ -114,7 +114,7 @@ function Header({ scrollContainer }: Props) {
               Projects
             </motion.li>
           </Link>
-          <Link href="contactB">
+          <Link href="#contactB">
             <motion.li
               whileHover={{ scale: 1.1 }}
               transition={{
