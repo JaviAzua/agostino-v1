@@ -1,15 +1,11 @@
 "use client";
-
-import React from "react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
-import { ReviewsT } from "@/types";
+import type { ReviewsT } from "@/types";
 import { motion } from "framer-motion";
 import { FaQuoteLeft } from "react-icons/fa";
 import Autoplay from "embla-carousel-autoplay";
@@ -26,7 +22,7 @@ function ClientReviews({ reviewsDB }: Props) {
       transition={{ duration: 0.6 }}
       className="w-full"
     >
-      <h3 className="text-2xl font-semibold mb-6 text-orangeL">
+      <h3 className="text-2xl font-semibold mb-8 text-orangeL">
         Client Reviews
       </h3>
       <Carousel
@@ -40,7 +36,7 @@ function ClientReviews({ reviewsDB }: Props) {
         <CarouselContent>
           {reviewsDB.map((review) => (
             <CarouselItem key={review._id}>
-              <Card className="bg-white/50 shadow-xl border-gray-700">
+              <Card className="bg-gray-800 border-gray-700 shadow-xl">
                 <CardContent className="flex flex-col items-center justify-center p-6 text-center h-full">
                   <FaQuoteLeft className="text-orangeL text-3xl mb-4" />
                   <blockquote className="text-base sm:text-lg text-gray-300 italic mb-4">
@@ -54,8 +50,6 @@ function ClientReviews({ reviewsDB }: Props) {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="text-orangeL hover:text-white hover:bg-orangeL/20 transition-colors duration-300 hidden" />
-        <CarouselNext className="text-orangeL hover:text-white hover:bg-orangeL/20 transition-colors duration-300 hidden" />
       </Carousel>
     </motion.div>
   );

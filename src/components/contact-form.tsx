@@ -73,25 +73,25 @@ export function ContactForm() {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6 }}
-      className="bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8"
+      className="w-full"
     >
-      <h3 className="text-2xl font-semibold mb-6 text-orangeL">Contact Us</h3>
+      <h3 className="text-2xl font-semibold mb-8 text-orangeL">Contact Us</h3>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-300">Email</FormLabel>
+                <FormLabel className="text-base text-gray-300">Email</FormLabel>
                 <FormControl>
                   <Input
-                    className="bg-gray-700 text-white border-gray-600 focus:border-orangeL"
+                    className="bg-gray-700 text-white border-gray-600 focus:border-orangeL text-base"
                     placeholder="your@email.com"
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className="text-red-400" />
+                <FormMessage className="text-sm text-red-400" />
               </FormItem>
             )}
           />
@@ -100,15 +100,17 @@ export function ContactForm() {
             name="subject"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-300">Subject</FormLabel>
+                <FormLabel className="text-base text-gray-300">
+                  Subject
+                </FormLabel>
                 <FormControl>
                   <Input
-                    className="bg-gray-700 text-white border-gray-600 focus:border-orangeL"
+                    className="bg-gray-700 text-white border-gray-600 focus:border-orangeL text-base"
                     placeholder="What's this about?"
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className="text-red-400" />
+                <FormMessage className="text-sm text-red-400" />
               </FormItem>
             )}
           />
@@ -117,21 +119,23 @@ export function ContactForm() {
             name="message"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-300">Message</FormLabel>
+                <FormLabel className="text-base text-gray-300">
+                  Message
+                </FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Tell us more about your inquiry..."
-                    className="h-32 bg-gray-700 text-white border-gray-600 focus:border-orangeL"
+                    className="h-32 bg-gray-700 text-white border-gray-600 focus:border-orangeL text-base"
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className="text-red-400" />
+                <FormMessage className="text-sm text-red-400" />
               </FormItem>
             )}
           />
           <Button
             type="submit"
-            className="w-full bg-orangeL text-gray-900 text-lg font-semibold tracking-wider py-6 hover:bg-orangeL/90 transition-colors duration-300"
+            className="w-full bg-orangeL text-gray-900 text-lg font-semibold tracking-wider py-4 hover:bg-orangeL/90 transition-colors duration-300"
           >
             Send Message
           </Button>

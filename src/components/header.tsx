@@ -7,7 +7,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import Link from "next/link";
 
 type Props = {
-  scrollContainer: RefObject<HTMLElement | null>;
+  scrollContainer: RefObject<HTMLElement>;
 };
 
 function Header({ scrollContainer }: Props) {

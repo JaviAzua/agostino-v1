@@ -2,26 +2,86 @@ import "./globals.css";
 import { Roboto } from "next/font/google";
 import { Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
+import { env } from "../../env";
 
 export const metadata: Metadata = {
-  title: "Gonzalo Agostino",
+  title: "Gonzalo Agostino | Professional Video Editor",
   description:
-    "Looking for a skilled video editor who can help you bring your vision to life? With years of experience in video editing and a background in cinematic arts, I have the skills and expertise to create visually stunning videos that communicate your message effectively.",
+    "Unlock the power of storytelling with high-quality video editing. Transform your vision into stunning visuals with a professional touch.",
+  keywords: [
+    "video editor",
+    "professional video editing",
+    "cinematic editing",
+    "post-production",
+    "motion graphics",
+    "visual storytelling",
+    "film editing",
+    "content creation",
+    "Gonzalo Agostino",
+    "video editing services",
+    "Adobe Premiere Pro",
+    "DaVinci Resolve",
+  ],
   openGraph: {
-    title: "Gonzalo Agostino Portfolio",
+    title: "Gonzalo Agostino | Professional Video Editor",
     description:
-      "Looking for a skilled video editor who can help you bring your vision to life? With years of experience in video editing and a background in cinematic arts, I have the skills and expertise to create visually stunning videos that communicate your message effectively.",
+      "Unlock the power of storytelling with high-quality video editing. Transform your vision into stunning visuals with a professional touch.",
+    url: env.BASE_URL,
+    siteName: "Gonzalo Agostino Portfolio",
     images: [
       {
-        url: "https://www.gonzaloagostino.com/thumbnail.png",
-        alt: "Gonzalo Agostino Portfolio Thumbnail",
+        url: `${env.BASE_URL}/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: "Gonzalo Agostino Portfolio",
       },
     ],
     type: "profile",
-    url: "https://www.gonzaloagostino.com",
   },
-  icons: {
-    icon: "/favicon.ico",
+  twitter: {
+    card: "summary_large_image",
+    title: "Gonzalo Agostino | Professional Video Editor",
+    description:
+      "Unlock the power of storytelling with high-quality video editing. Transform your vision into stunning visuals with a professional touch.",
+    images: [`${env.BASE_URL}/og-image.jpg`],
+  },
+  robots: "index, follow",
+  alternates: {
+    canonical: env.BASE_URL,
+  },
+  icons: [
+    {
+      url: "/favicon.ico",
+      rel: "icon",
+      sizes: "32x32",
+      type: "image/x-icon",
+    },
+    {
+      url: "/favicon-dark.ico",
+      media: "(prefers-color-scheme: dark)",
+      rel: "icon",
+      sizes: "32x32",
+      type: "image/x-icon",
+    },
+    {
+      url: "/favicon.svg",
+      type: "image/svg+xml",
+    },
+    {
+      url: "/apple-touch-icon.png",
+      sizes: "180x180",
+      rel: "apple-touch-icon",
+    },
+  ],
+  other: {
+    "application/ld+json": JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "Gonzalo Agostino",
+      url: env.BASE_URL,
+      jobTitle: "Video Editor",
+      image: `${env.BASE_URL}/profile.webp`,
+    }),
   },
 };
 

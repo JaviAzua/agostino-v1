@@ -15,7 +15,7 @@ function Footer() {
         </Link>
       </div>
       <p className="md:absolute bottom-2 left-10 text-[0.5rem]">
-        ©2023 - Web made by JavierAzua
+        {new Date().getFullYear()} - Web made by JavierAzua
       </p>
     </div>
   );

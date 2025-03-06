@@ -1,24 +1,32 @@
-import { AboutT, BannerT, VideoGridT, ReviewsT } from "@/types";
-import { client } from "@/lib/client";
+import type { AboutT, BannerT, VideoGridT, ReviewsT } from "@/types";
 import ClientMainPage from "@/components/client-main-page";
+import { env } from "../../env";
+
+// Interfaz para los datos que esperamos de la API
+interface ApiResponse {
+  bannerImg: BannerT[];
+  videoGrid: VideoGridT[];
+  aboutDB: AboutT[];
+  reviewsDB: ReviewsT[];
+}
 
 export default async function Page() {
-  const bannerQuery = '*[_type == "banner"]';
-  const videoQuery = '*[_type == "videoGrid"]';
-  const aboutQuery = '*[_type == "about"]';
-  const reviewsQuery = '*[_type == "reviews"]';
+  const res = await fetch(`${env.BASE_URL}/api/data`, {
+    next: { revalidate: 172800 }, // 48 horas en segundos
+  });
 
-  const bannerImg: BannerT[] = await client.fetch(bannerQuery);
-  const videoGrid: VideoGridT[] = await client.fetch(videoQuery);
-  const aboutDB: AboutT[] = await client.fetch(aboutQuery);
-  const reviewsDB: ReviewsT[] = await client.fetch(reviewsQuery);
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+
+  const data: ApiResponse = await res.json();
 
   return (
     <ClientMainPage
-      bannerImg={bannerImg}
-      videoGrid={videoGrid}
-      aboutDB={aboutDB}
-      reviewsDB={reviewsDB}
+      bannerImg={data.bannerImg}
+      videoGrid={data.videoGrid}
+      aboutDB={data.aboutDB}
+      reviewsDB={data.reviewsDB}
     />
   );
 }

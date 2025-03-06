@@ -18,7 +18,7 @@ type Props = {
   aboutDB: AboutT;
 };
 
-function About({ aboutDB }: Props) {
+function AboutSection({ aboutDB }: Props) {
   const Words = aboutDB.machineText.map((w) => w);
   const url = urlFor(aboutDB.photo && aboutDB.photo).url();
 
@@ -29,12 +29,12 @@ function About({ aboutDB }: Props) {
   });
 
   return (
-    <article className="w-full">
-      <h2 className="text-gray-500 text-center font-semibold text-2xl tracking-[2rem] mb-10">
+    <article className="w-full container mx-auto px-4 flex flex-col h-full">
+      <h2 className="text-gray-500 text-center font-semibold text-2xl md:tracking-[2rem] mb-10">
         About
       </h2>
-      <div className="flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-20">
-        <div className="relative w-60 h-60 md:w-80 md:h-80 flex-shrink-0">
+      <div className="flex flex-grow flex-col lg:flex-row justify-center gap-10 lg:gap-20">
+        <div className="relative size-60 md:size-80 lg:size-96 xl:size-[30rem] flex-shrink-0 mx-auto">
           <Image
             src={url}
             alt="Profile picture"
@@ -69,4 +69,4 @@ function About({ aboutDB }: Props) {
   );
 }
 
-export default About;
+export default AboutSection;
