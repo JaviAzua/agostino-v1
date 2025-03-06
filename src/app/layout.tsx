@@ -53,14 +53,14 @@ export const metadata: Metadata = {
     {
       url: "/favicon.ico",
       rel: "icon",
-      sizes: "32x32",
+      sizes: "48x48",
       type: "image/x-icon",
     },
     {
       url: "/favicon-dark.ico",
       media: "(prefers-color-scheme: dark)",
       rel: "icon",
-      sizes: "32x32",
+      sizes: "48x48",
       type: "image/x-icon",
     },
     {
