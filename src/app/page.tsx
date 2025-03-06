@@ -1,8 +1,8 @@
 import type { AboutT, BannerT, VideoGridT, ReviewsT } from "@/types";
 import ClientMainPage from "@/components/client-main-page";
 import { env } from "../../env";
+import { FaSpinner } from "react-icons/fa";
 
-// Interfaz para los datos que esperamos de la API
 interface ApiResponse {
   bannerImg: BannerT[];
   videoGrid: VideoGridT[];
@@ -11,22 +11,28 @@ interface ApiResponse {
 }
 
 export default async function Page() {
-  const res = await fetch(`${env.BASE_URL}/api/data`, {
-    next: { revalidate: 172800 }, // 48 horas en segundos
-  });
+  try {
+    const res = await fetch(`${env.BASE_URL}/api/data`, {
+      next: { revalidate: 172800 },
+    });
+    if (!res.ok) throw new Error("API not available");
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
+    const data: ApiResponse = await res.json();
+
+    return (
+      <ClientMainPage
+        bannerImg={data.bannerImg}
+        videoGrid={data.videoGrid}
+        aboutDB={data.aboutDB}
+        reviewsDB={data.reviewsDB}
+      />
+    );
+  } catch (error) {
+    console.error(error);
+    return (
+      <div className="animate-spin">
+        <FaSpinner />
+      </div>
+    );
   }
-
-  const data: ApiResponse = await res.json();
-
-  return (
-    <ClientMainPage
-      bannerImg={data.bannerImg}
-      videoGrid={data.videoGrid}
-      aboutDB={data.aboutDB}
-      reviewsDB={data.reviewsDB}
-    />
-  );
 }
