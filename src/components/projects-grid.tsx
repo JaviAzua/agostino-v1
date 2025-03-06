@@ -32,13 +32,13 @@ function ProjectsGrid({
   };
 
   return (
-    <section className="w-full py-8 md:py-12 min-h-screen flex flex-col">
+    <section className="w-full py-8 min-h-[200vh] md:min-h-screen flex flex-col">
       {/* Section heading with improved typography */}
       <motion.h2
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-gray-500 text-center font-semibold text-2xl md:text-3xl md:tracking-[1rem] mb-10"
+        className="text-gray-500 text-center font-semibold text-2xl md:text-3xl md:tracking-[1rem]"
       >
         {title}
       </motion.h2>
@@ -65,7 +65,7 @@ function ProjectsGrid({
           variants={container}
           initial="hidden"
           animate="show"
-          className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 p-4 md:p-6 overflow-y-auto"
+          className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 p-4 md:p-6 overflow-y-auto mb-14"
         >
           {videoGrid.map((video) => (
             <motion.div
