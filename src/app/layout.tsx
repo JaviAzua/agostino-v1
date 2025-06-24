@@ -2,6 +2,19 @@ import "./globals.css";
 import { Roboto } from "next/font/google";
 import { Metadata } from "next";
 import { env } from "../../env";
+import { client } from "@/sanity/client";
+import { AboutType, BannerType, ReviewsType, VideoGridType } from "@/types";
+import { HOMEPAGE_QUERY } from "@/lib/queries";
+import HomeSection from "@/components/sections/HomeSection";
+import Navbar from "@/components/navbar/navbar";
+import React from "react";
+
+import "@fontsource-variable/dm-sans/index.css";
+import VideoGridSection from "@/components/sections/VideoGridSection";
+import AboutSection from "@/components/sections/AboutSection";
+import ContactSection from "@/components/sections/ContactSection";
+
+const options = { next: { revalidate: 604800 } };
 
 export const metadata: Metadata = {
   title: "Gonzalo Agostino | Professional Video Editor",
@@ -94,14 +107,32 @@ const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { /* videoGrid, about,reviews, */ banner } = await client.fetch<{
+    videoGrid: VideoGridType[];
+    about: AboutType[];
+    banner: BannerType[];
+    reviews: ReviewsType[];
+  }>(HOMEPAGE_QUERY, {}, options);
+
+  const isNight = Math.random() < 0.5;
+
   return (
     <html lang="en">
-      <body className={`${roboto.className}`}>{children}</body>
+      <body className={roboto.className}>
+        <Navbar isNight={isNight} />
+        <main>
+          <HomeSection data={banner} isNight={!isNight} />
+          <VideoGridSection /* data={videoGrid} isNight={isNight}  */ />
+          <AboutSection /* data={about} isNight={isNight} */ />
+          <ContactSection /* data={reviews} isNight={isNight}  */ />
+          {children}
+        </main>
+      </body>
     </html>
   );
 }
