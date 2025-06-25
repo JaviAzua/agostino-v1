@@ -10,6 +10,7 @@ export default {
     extend: {
       fontFamily: {
         dm: ["'DM Sans Variable'", "sans-serif"],
+        "darker-grotesque": ["'Darker Grotesque Variable'", "sans-serif"],
       },
       colors: {
         persian_orange: {

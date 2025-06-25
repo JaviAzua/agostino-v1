@@ -1,18 +1,18 @@
 import "./globals.css";
-import { Roboto } from "next/font/google";
 import { Metadata } from "next";
 import { env } from "../../env";
 import { client } from "@/sanity/client";
 import { AboutType, BannerType, ReviewsType, VideoGridType } from "@/types";
 import { HOMEPAGE_QUERY } from "@/lib/queries";
 import HomeSection from "@/components/sections/HomeSection";
-import Navbar from "@/components/navbar/navbar";
-import React from "react";
-
-import "@fontsource-variable/dm-sans/index.css";
 import VideoGridSection from "@/components/sections/VideoGridSection";
 import AboutSection from "@/components/sections/AboutSection";
 import ContactSection from "@/components/sections/ContactSection";
+
+import Navbar from "@/components/navbar/navbar";
+
+import "@fontsource-variable/dm-sans/index.css";
+import "@fontsource-variable/darker-grotesque";
 
 const options = { next: { revalidate: 604800 } };
 
@@ -102,11 +102,6 @@ export const viewport = {
   initialScale: 1,
 };
 
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["100", "300", "400", "500", "700", "900"],
-});
-
 export default async function RootLayout({
   children,
 }: {
@@ -123,7 +118,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={roboto.className}>
+      <body>
         <Navbar isNight={isNight} />
         <main>
           <HomeSection data={banner} isNight={!isNight} />
