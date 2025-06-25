@@ -25,15 +25,32 @@ export default function HomeSection({ data, isNight }: HomeSectionProps) {
 
   useGSAP(() => {
     if (titleRef.current) {
-      const split = new SplitText(titleRef.current, { type: "words,lines" });
+      const titleSplit = new SplitText(titleRef.current, { type: "words" });
+      const subtitle = document.getElementById("subtitle");
+      const subtitleSplit = new SplitText(subtitle, { type: "words" });
 
-      gsap.from(split.words, {
-        delay: 0.5,
+      const tl = gsap.timeline();
+
+      tl.from(titleSplit.words, {
         y: 15,
         autoAlpha: 0,
         filter: "blur(15px)",
         stagger: 0.1,
+        delay: 0.5,
+        ease: "power2.out",
       });
+
+      tl.from(
+        subtitleSplit.words,
+        {
+          y: 10,
+          autoAlpha: 0,
+          filter: "blur(5px)",
+          stagger: 0.05,
+          ease: "power1.out",
+        },
+        "-=0.3"
+      );
     }
   }, []);
 
@@ -82,13 +99,15 @@ export default function HomeSection({ data, isNight }: HomeSectionProps) {
 
   return (
     <div id="home" className={`${bgClass} h-dvh flex flex-col overflow-hidden`}>
-      <div ref={titleRef} className="w-full flex flex-col">
+      <div className="w-full flex flex-col">
         <h1
+          ref={titleRef}
           className={`relative font-dm px-6 pt-6 font-bold text-[4rem] md:text-[7rem] lg:text-[8rem] xl:text-[9rem] ${textClass} text-right leading-none`}
         >
           GONZALO AGOSTINO
         </h1>
         <p
+          id="subtitle"
           className={`${textClass} text-right text-pretty px-10 text-[1.5rem] md:text-[2rem] lg:text-[2.75rem] xl:text-[3.5rem] font-darker-grotesque w-[50%] md:w-full self-end`}
         >
           Unlock the power of storytelling with high-quality video editing
