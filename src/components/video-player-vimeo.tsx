@@ -19,9 +19,17 @@ import { Button } from "@/components/ui/button";
 interface VideoPlayerVimeoProps {
   vimeoUrl: string;
   isNight: boolean;
+  title?: string;
+  autoplay?: boolean;
+  shouldScale?: boolean;
 }
 
-const VideoPlayerVimeo = ({ vimeoUrl, isNight }: VideoPlayerVimeoProps) => {
+const VideoPlayerVimeo = ({
+  vimeoUrl,
+  isNight,
+  autoplay = true,
+  shouldScale = true,
+}: VideoPlayerVimeoProps) => {
   const playerContainerRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
@@ -56,21 +64,23 @@ const VideoPlayerVimeo = ({ vimeoUrl, isNight }: VideoPlayerVimeoProps) => {
       // Subtle hover effect
       const videoElement = playerContainerRef.current;
 
-      videoElement.addEventListener("mouseenter", () => {
-        gsap.to(videoElement, {
-          scale: 1.02,
-          duration: 0.4,
-          ease: "power2.out",
+      if (shouldScale) {
+        videoElement.addEventListener("mouseenter", () => {
+          gsap.to(videoElement, {
+            scale: 1.02,
+            duration: 0.4,
+            ease: "power2.out",
+          });
         });
-      });
 
-      videoElement.addEventListener("mouseleave", () => {
-        gsap.to(videoElement, {
-          scale: 1,
-          duration: 0.4,
-          ease: "power2.out",
+        videoElement.addEventListener("mouseleave", () => {
+          gsap.to(videoElement, {
+            scale: 1,
+            duration: 0.4,
+            ease: "power2.out",
+          });
         });
-      });
+      }
     }
 
     // Animate controls on mount
@@ -115,7 +125,7 @@ const VideoPlayerVimeo = ({ vimeoUrl, isNight }: VideoPlayerVimeoProps) => {
     if (!playerContainerRef.current || !vimeoId) return;
     const player = new Player(playerContainerRef.current, {
       id: vimeoId,
-      autoplay: true,
+      autoplay: autoplay,
       muted: true,
       controls: false,
       responsive: true,
@@ -171,7 +181,7 @@ const VideoPlayerVimeo = ({ vimeoUrl, isNight }: VideoPlayerVimeoProps) => {
     return () => {
       player.unload();
     };
-  }, [vimeoId]);
+  }, [vimeoId, autoplay]);
 
   // Enhanced button animations
   const animateButton = (element: HTMLElement, scale = 1.15) => {
@@ -201,7 +211,7 @@ const VideoPlayerVimeo = ({ vimeoUrl, isNight }: VideoPlayerVimeoProps) => {
     if (!playerRef.current) return;
     playerRef.current.getVolume().then((vol: number) => {
       if (vol === 0) {
-        playerRef.current?.setVolume(1);
+        playerRef.current?.setVolume(0.4);
         // Animate volume slider in
         if (volumeSliderRef.current) {
           gsap.to(volumeSliderRef.current, {
@@ -358,7 +368,7 @@ const VideoPlayerVimeo = ({ vimeoUrl, isNight }: VideoPlayerVimeoProps) => {
   return (
     <div
       ref={playerContainerRef}
-      className="relative mx-auto w-full max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 2xl:max-w-[50vw] aspect-video rounded-lg overflow-hidden shadow-2xl"
+      className="relative mx-auto w-full aspect-video overflow-hidden shadow-2xl"
     >
       {isVideoLoading && (
         <div

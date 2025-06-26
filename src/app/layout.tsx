@@ -107,7 +107,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { /* videoGrid, about,reviews, */ banner } = await client.fetch<{
+  const { /*about,reviews, */ videoGrid, banner } = await client.fetch<{
     videoGrid: VideoGridType[];
     about: AboutType[];
     banner: BannerType[];
@@ -122,7 +122,7 @@ export default async function RootLayout({
         <Navbar isNight={isNight} />
         <main>
           <HomeSection data={banner} isNight={!isNight} />
-          <VideoGridSection /* data={videoGrid} isNight={isNight}  */ />
+          <VideoGridSection data={videoGrid} isNight={isNight} />
           <AboutSection /* data={about} isNight={isNight} */ />
           <ContactSection /* data={reviews} isNight={isNight}  */ />
           {children}

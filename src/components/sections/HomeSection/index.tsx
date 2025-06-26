@@ -1,11 +1,10 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/SplitText";
-import Player from "@vimeo/player";
-import VideoPlayerVimeo from "@/components/VideoPlayerVimeo";
+import VideoPlayerVimeo from "@/components/video-player-vimeo";
 import type { BannerType } from "@/types";
 
 gsap.registerPlugin(SplitText);
@@ -17,25 +16,20 @@ interface HomeSectionProps {
 
 export default function HomeSection({ data, isNight }: HomeSectionProps) {
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const playerContainerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<Player | null>(null);
 
   const vimeoUrl = data[0]?.url;
-  const vimeoId = vimeoUrl ? Number(vimeoUrl.split("/").pop()) : undefined;
 
   useGSAP(() => {
     if (titleRef.current) {
-      const titleSplit = new SplitText(titleRef.current, { type: "words" });
       const subtitle = document.getElementById("subtitle");
       const subtitleSplit = new SplitText(subtitle, { type: "words" });
 
       const tl = gsap.timeline();
 
-      tl.from(titleSplit.words, {
-        y: 15,
+      tl.from(titleRef.current, {
         autoAlpha: 0,
         filter: "blur(15px)",
-        stagger: 0.1,
+        duration: 1,
         delay: 0.5,
         ease: "power2.out",
       });
@@ -46,7 +40,7 @@ export default function HomeSection({ data, isNight }: HomeSectionProps) {
           y: 10,
           autoAlpha: 0,
           filter: "blur(5px)",
-          stagger: 0.05,
+          stagger: 0.1,
           ease: "power1.out",
         },
         "-=0.3"
@@ -54,67 +48,33 @@ export default function HomeSection({ data, isNight }: HomeSectionProps) {
     }
   }, []);
 
-  useEffect(() => {
-    if (!playerContainerRef.current || !vimeoId) return;
-    const player = new Player(playerContainerRef.current, {
-      id: vimeoId,
-      autoplay: true,
-      muted: true,
-      controls: false,
-      responsive: true,
-      background: false,
-    });
-    playerRef.current = player;
-
-    player.on("loaded", () => {
-      // Animate video fade in when loaded
-      if (playerContainerRef.current) {
-        gsap.fromTo(
-          playerContainerRef.current.querySelector("iframe"),
-          {
-            autoAlpha: 0,
-          },
-          {
-            autoAlpha: 1,
-            duration: 0.8,
-            ease: "power2.out",
-          }
-        );
-      }
-    });
-
-    player.on("play", () => {});
-    player.on("pause", () => {});
-    player.on("volumechange", () => {});
-
-    player.getPaused().then(() => {});
-
-    return () => {
-      player.unload();
-    };
-  }, [vimeoId]);
-
   const bgClass = isNight ? "bg-night" : "bg-honeydew";
   const textClass = isNight ? "text-persian_orange" : "text-night";
 
   return (
-    <div id="home" className={`${bgClass} h-dvh flex flex-col overflow-hidden`}>
-      <div className="w-full flex flex-col">
+    <div id="home" className={`${bgClass} min-h-dvh overflow-x-hidden`}>
+      <div className="w-full flex flex-col items-end">
         <h1
           ref={titleRef}
-          className={`relative font-dm px-6 pt-6 font-bold text-[4rem] md:text-[7rem] lg:text-[8rem] xl:text-[9rem] ${textClass} text-right leading-none`}
+          className={`relative font-dm px-6 pt-10 md:pt-6 font-bold text-[2rem] sm:text-[5rem] md:text-[6rem] lg:text-[7rem] xl:text-[10rem] ${textClass} text-right leading-none w-[70%] lg:w-full`}
         >
           GONZALO AGOSTINO
         </h1>
         <p
           id="subtitle"
-          className={`${textClass} text-right text-pretty px-10 text-[1.5rem] md:text-[2rem] lg:text-[2.75rem] xl:text-[3.5rem] font-darker-grotesque w-[50%] md:w-full self-end`}
+          className={`${textClass} text-right text-pretty px-10 text-[1rem] sm:text-[1.5rem] md:text-[2rem] lg:text-[2.75rem] xl:text-[3.5rem] font-darker-grotesque w-[50%] md:w-full self-end`}
         >
           Unlock the power of storytelling with high-quality video editing
         </p>
       </div>
-      <div className="flex-1 flex items-center justify-center w-full">
-        {vimeoUrl && <VideoPlayerVimeo vimeoUrl={vimeoUrl} isNight={isNight} />}
+      <div className="w-full pt-20 pb-20 flex flex-col items-center max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 2xl:max-w-[50vw] mx-auto">
+        {vimeoUrl && (
+          <VideoPlayerVimeo
+            vimeoUrl={vimeoUrl}
+            isNight={isNight}
+            title="Home Video"
+          />
+        )}
       </div>
     </div>
   );
