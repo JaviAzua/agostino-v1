@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-honeydew: #eaf2e3;
+  --color-night: #121619;
+  --color-persian-orange: #ed8f49;
+  --color-madder: #b10f2e;
+}
+
+@media (min-width: 768px) {
+  a,
+  button,
+  body,
+  input,
+  textarea,
+  select,
+  label {
+    cursor: none !important;
+  }
+}

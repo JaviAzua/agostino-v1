@@ -1,81 +1,136 @@
 "use client";
 
-import { useRef } from "react";
-import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react";
-import { SplitText } from "gsap/SplitText";
 import VideoPlayerVimeo from "@/components/video-player-vimeo";
 import type { BannerType } from "@/types";
-
-gsap.registerPlugin(SplitText);
+import { Logo } from "@/components/Logo";
+import { useGSAP } from "@gsap/react";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import Navbar from "@/components/navbar/navbar";
+import JaLogo from "@/components/ja-logo";
 
 interface HomeSectionProps {
   data: BannerType[];
-  isNight: boolean;
 }
 
-export default function HomeSection({ data, isNight }: HomeSectionProps) {
-  const titleRef = useRef<HTMLHeadingElement>(null);
-
+export default function HomeSection({ data }: HomeSectionProps) {
   const vimeoUrl = data[0]?.url;
+  const scopeRef = useRef(null);
+  const [isFooterHidden, setIsFooterHidden] = useState(false);
+  const lastScrollY = useRef(0);
 
-  useGSAP(() => {
-    if (titleRef.current) {
-      const subtitle = document.getElementById("subtitle");
-      const subtitleSplit = new SplitText(subtitle, { type: "words" });
-
-      const tl = gsap.timeline();
-
-      tl.from(titleRef.current, {
-        autoAlpha: 0,
-        filter: "blur(15px)",
-        duration: 1,
-        delay: 0.5,
-        ease: "power2.out",
-      });
-
-      tl.from(
-        subtitleSplit.words,
-        {
-          y: 10,
-          autoAlpha: 0,
-          filter: "blur(5px)",
-          stagger: 0.1,
-          ease: "power1.out",
-        },
-        "-=0.3"
-      );
-    }
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current) {
+        setIsFooterHidden(true);
+      } else {
+        setIsFooterHidden(false);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const bgClass = isNight ? "bg-night" : "bg-honeydew";
-  const textClass = isNight ? "text-persian_orange" : "text-night";
+  useGSAP(
+    () => {
+      const logoContainerElement =
+        gsap.utils.selector(scopeRef)(".logo-container");
+      const logoPathElement = gsap.utils.selector(scopeRef)(
+        ".logo-container path"
+      );
+      const videoContainerElement =
+        gsap.utils.selector(scopeRef)(".video-container");
+      const footerElement = gsap.utils.selector(scopeRef)(".footer-element");
+      const mainTl = gsap.timeline({
+        defaults: { ease: "power3.out" },
+        repeat: 0,
+      });
+
+      mainTl.fromTo(
+        logoContainerElement,
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: 1 }
+      );
+      mainTl.fromTo(
+        footerElement,
+        { autoAlpha: 0, y: 50 },
+        { autoAlpha: 1, y: 0, duration: 0.8 },
+        "+=0.2"
+      );
+      mainTl.fromTo(
+        videoContainerElement,
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: 0.8 },
+        "+=0.2"
+      );
+
+      const colors = [
+        "#eaf2e3",
+        "#ed8f49",
+        "#85baa1",
+        "#e8e7ee",
+        "#fac5cf",
+        "eaf2e3",
+      ];
+      const colorDuration = 10;
+
+      const colorTl = gsap.timeline({ repeat: -1, yoyo: true });
+
+      colors.forEach((color) => {
+        colorTl.to(logoPathElement, {
+          delay: 3,
+          fill: color,
+          duration: colorDuration,
+          ease: "none",
+        });
+      });
+
+      const triangleElement = gsap.utils.selector(scopeRef)(".triangle");
+      const tl = gsap.timeline({
+        yoyo: true,
+        repeat: -1,
+      });
+
+      tl.to(triangleElement, { height: "40px", duration: 2.4 })
+        .to(triangleElement, { height: "60px", duration: 0.8 })
+        .to(triangleElement, { height: "40px", duration: 0.8 });
+    },
+
+    { scope: scopeRef }
+  );
 
   return (
-    <div id="home" className={`${bgClass} min-h-dvh overflow-x-hidden`}>
-      <div className="w-full flex flex-col items-end">
-        <h1
-          ref={titleRef}
-          className={`relative font-dm px-6 pt-10 md:pt-6 font-bold text-[2rem] sm:text-[5rem] md:text-[6rem] lg:text-[7rem] xl:text-[10rem] ${textClass} text-right leading-none w-[70%] lg:w-full`}
-        >
-          GONZALO AGOSTINO
-        </h1>
-        <p
-          id="subtitle"
-          className={`${textClass} text-right text-pretty px-10 text-[1rem] sm:text-[1.5rem] md:text-[2rem] lg:text-[2.75rem] xl:text-[3.5rem] font-darker-grotesque w-[50%] md:w-full self-end`}
-        >
-          Unlock the power of storytelling with high-quality video editing
-        </p>
+    <div
+      ref={scopeRef}
+      className="relative flex flex-col h-dvh w-full bg-night"
+    >
+      <div className="w-full p-6 z-0 logo-container">
+        <Logo className="w-full h-auto" />
       </div>
-      <div className="w-full pt-20 pb-20 flex flex-col items-center max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 2xl:max-w-[50vw] mx-auto">
+      <div className="absolute inset-0 flex items-center justify-center z-10">
         {vimeoUrl && (
-          <VideoPlayerVimeo
-            vimeoUrl={vimeoUrl}
-            isNight={isNight}
-            title="Home Video"
-          />
+          <div className="video-container w-full max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 2xl:max-w-[50vw]">
+            <VideoPlayerVimeo vimeoUrl={vimeoUrl} title="Home Video" />
+          </div>
         )}
       </div>
+
+      <footer
+        className={`w-full absolute bottom-0 flex z-20 footer-element text-honeydew ${
+          isFooterHidden && "hidden"
+        }`}
+      >
+        <JaLogo className="flex-1" />
+        <div
+          id="triangle"
+          className="w-[2px] bg-current absolute bottom-0 left-1/2 -translate-x-1/2 triangle h-[20px]"
+        ></div>
+        <div className="pb-2 flex-1 flex justify-end px-4">
+          <Navbar />
+        </div>
+      </footer>
     </div>
   );
 }

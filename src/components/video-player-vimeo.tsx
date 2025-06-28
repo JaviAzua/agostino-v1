@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 
 interface VideoPlayerVimeoProps {
   vimeoUrl: string;
-  isNight: boolean;
   title?: string;
   autoplay?: boolean;
   shouldScale?: boolean;
@@ -26,7 +25,6 @@ interface VideoPlayerVimeoProps {
 
 const VideoPlayerVimeo = ({
   vimeoUrl,
-  isNight,
   autoplay = true,
   shouldScale = true,
 }: VideoPlayerVimeoProps) => {
@@ -39,7 +37,7 @@ const VideoPlayerVimeo = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isVideoLoading, setIsVideoLoading] = useState(true);
+  /*   const [isVideoLoading, setIsVideoLoading] = useState(true); */
   const [volume, setVolume] = useState(0);
   const [showControls, setShowControls] = useState(true);
 
@@ -123,6 +121,9 @@ const VideoPlayerVimeo = ({
 
   useEffect(() => {
     if (!playerContainerRef.current || !vimeoId) return;
+    const container = playerContainerRef.current;
+    if (!container) return;
+
     const player = new Player(playerContainerRef.current, {
       id: vimeoId,
       autoplay: autoplay,
@@ -133,10 +134,10 @@ const VideoPlayerVimeo = ({
       loop: true,
     });
     playerRef.current = player;
-    setIsVideoLoading(true);
+    /* setIsVideoLoading(true); */
 
     player.on("loaded", () => {
-      setIsVideoLoading(false);
+      /*  setIsVideoLoading(false); */
 
       // Animate loading out and video in
       if (loadingRef.current) {
@@ -160,6 +161,7 @@ const VideoPlayerVimeo = ({
             duration: 1,
             ease: "power2.out",
             delay: 0.3,
+            zIndex: -1,
           }
         );
       }
@@ -361,23 +363,17 @@ const VideoPlayerVimeo = ({
     };
   }, []);
 
-  const buttonColor = isNight
-    ? "text-persian_orange hover:bg-persian_orange/20"
-    : "text-white hover:bg-white/20";
+  const buttonColor = "text-white hover:bg-white/20";
 
   return (
     <div
       ref={playerContainerRef}
       className="relative mx-auto w-full aspect-video overflow-hidden shadow-2xl"
     >
-      {isVideoLoading && (
+      {/*  {isVideoLoading && (
         <div
           ref={loadingRef}
-          className={`absolute inset-0 flex items-center justify-center z-20 backdrop-blur-sm ${
-            isNight
-              ? "text-persian_orange bg-night/50"
-              : "text-night bg-honeydew/50"
-          }`}
+          className={`absolute inset-0 flex items-center justify-center z-20 backdrop-blur-sm text-honeydew bg-night/50`}
         >
           <div className="flex flex-col items-center gap-4">
             <svg
@@ -403,11 +399,11 @@ const VideoPlayerVimeo = ({
             <p className="text-sm font-medium">Loading video...</p>
           </div>
         </div>
-      )}
+      )} */}
 
       <div
         ref={controlsRef}
-        className="absolute bottom-4 right-4 flex gap-2 z-10 pointer-events-auto items-center bg-black/20 backdrop-blur-md rounded-full px-3 py-2"
+        className="cursor-none absolute bottom-4 right-4 flex gap-2 z-10 items-center bg-black/20 backdrop-blur-md rounded-full px-3 py-2 pointer-events-auto"
       >
         <Button
           variant="ghost"
@@ -445,7 +441,7 @@ const VideoPlayerVimeo = ({
           step={1}
           value={Math.round(volume * 100)}
           onChange={handleVolumeChange}
-          className="w-20 h-2 accent-persian_orange bg-white/30 rounded-lg appearance-none cursor-pointer"
+          className="w-20 h-2 accent-persian_orange bg-white/30 rounded-lg appearance-none"
           aria-label="Volume"
         />
 

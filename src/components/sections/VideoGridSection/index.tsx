@@ -14,22 +14,19 @@ import { cn } from "@/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useCursor } from "@/components/cursor/custom-cursor";
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface VideoGridSectionProps {
   data: VideoGridType[];
-  isNight: boolean;
 }
 
-export default function VideoGridSection({
-  data,
-  isNight,
-}: VideoGridSectionProps) {
-  const bgClass = isNight ? "bg-night" : "bg-honeydew";
-  const textClass = isNight ? "text-persian_orange" : "text-night";
-  const subtitleClass = isNight ? "text-honeydew" : "text-night";
-  const modalBgClass = isNight ? "bg-night" : "bg-honeydew";
+export default function VideoGridSection({ data }: VideoGridSectionProps) {
+  const bgClass = "bg-honeydew";
+  const textClass = "text-night";
+
+  const { setVariant } = useCursor();
 
   const initialOpenItems = data.slice(0, 3).map((item) => item._id);
   const [openAccordionItems, setOpenAccordionItems] =
@@ -104,36 +101,47 @@ export default function VideoGridSection({
                 aria-label={`${index} Work ${item.name}, made by Gonzalo Agostino`}
                 className={cn(
                   "gsap-item-reveal border-none shadow-none",
-                  isFullRow && "md:col-span-2",
-                  modalBgClass
+                  isFullRow && "md:col-span-2"
                 )}
               >
-                <AccordionTrigger className="px-2 text-left hover:no-underline">
-                  <div>
-                    <h3 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold font-darker-grotesque">
-                      {item.name}
-                    </h3>
-
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      className={`text-[0.6rem] underline ml-1 cursor-pointer ${subtitleClass}`}
-                      aria-label={isOpen ? "Show less" : "Show more"}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleAccordion(item._id);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
+                {!isOpen && (
+                  <AccordionTrigger
+                    className={"px-2 text-left hover:no-underline"}
+                    onMouseEnter={() => {
+                      setVariant("arrow");
+                    }}
+                    onMouseLeave={() => {
+                      setVariant("circle");
+                    }}
+                    onClick={() => {
+                      setVariant("circle");
+                    }}
+                  >
+                    <div>
+                      <h3 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold font-darker-grotesque">
+                        {item.name}
+                      </h3>
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        className={"text-[0.6rem] underline ml-1 cursor-none"}
+                        aria-label={isOpen ? "Show less" : "Show more"}
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handleToggleAccordion(item._id);
-                        }
-                      }}
-                    >
-                      {isOpen ? "Show less" : "Show more"}
-                    </span>
-                  </div>
-                </AccordionTrigger>
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleToggleAccordion(item._id);
+                          }
+                        }}
+                      >
+                        {isOpen ? "Show less" : "Show more"}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                )}
                 <AccordionContent className="p-0">
                   <div
                     ref={(el) => {
@@ -141,20 +149,19 @@ export default function VideoGridSection({
                     }}
                     className="overflow-hidden"
                   >
-                    <p
-                      className={cn(
-                        "transition-all duration-300 font-dm text-sm px-2 pb-1",
-                        subtitleClass
-                      )}
-                    >
-                      {item.description}
-                    </p>
-                    <VideoPlayerVimeo
-                      vimeoUrl={item.url}
-                      isNight={isNight}
-                      autoplay={false}
-                      shouldScale={false}
-                    />
+                    {isOpen && (
+                      <div className="relative group">
+                        <span className="transition-all  duration-300 group-hover:text-black absolute bottom-2 left-2 text-white px-3 py-1 z-10 text-lg md:text-2xl xl:text-3xl tracking-wide font-darker-grotesque font-extrabold">
+                          {item.name}
+                        </span>
+
+                        <VideoPlayerVimeo
+                          vimeoUrl={item.url}
+                          autoplay={false}
+                          shouldScale={false}
+                        />
+                      </div>
+                    )}
                   </div>
                 </AccordionContent>
               </AccordionItem>

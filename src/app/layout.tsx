@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import "./globals.css";
 import { Metadata } from "next";
 import { env } from "../../env";
@@ -9,12 +11,9 @@ import VideoGridSection from "@/components/sections/VideoGridSection";
 import AboutSection from "@/components/sections/AboutSection";
 import ContactSection from "@/components/sections/ContactSection";
 
-import Navbar from "@/components/navbar/navbar";
-
 import "@fontsource-variable/dm-sans/index.css";
 import "@fontsource-variable/darker-grotesque";
-
-const options = { next: { revalidate: 604800 } };
+import CustomCursor from "@/components/cursor/custom-cursor";
 
 export const metadata: Metadata = {
   title: "Gonzalo Agostino | Professional Video Editor",
@@ -112,21 +111,20 @@ export default async function RootLayout({
     about: AboutType[];
     banner: BannerType[];
     reviews: ReviewsType[];
-  }>(HOMEPAGE_QUERY, {}, options);
-
-  const isNight = Math.random() < 0.5;
+  }>(HOMEPAGE_QUERY, {}, { next: { revalidate: 604800 } });
 
   return (
     <html lang="en">
       <body>
-        <Navbar isNight={isNight} />
-        <main>
-          <HomeSection data={banner} isNight={!isNight} />
-          <VideoGridSection data={videoGrid} isNight={isNight} />
-          <AboutSection /* data={about} isNight={isNight} */ />
-          <ContactSection /* data={reviews} isNight={isNight}  */ />
-          {children}
-        </main>
+        <CustomCursor>
+          <main>
+            <HomeSection data={banner} />
+            <VideoGridSection data={videoGrid} />
+            <AboutSection /* data={about} isNight={isNight} */ />
+            <ContactSection /* data={reviews} isNight={isNight}  */ />
+            {children}
+          </main>
+        </CustomCursor>
       </body>
     </html>
   );
