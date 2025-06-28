@@ -2,12 +2,12 @@
 
 import VideoPlayerVimeo from "@/components/video-player-vimeo";
 import type { BannerType } from "@/types";
-import { Logo } from "@/components/Logo";
 import { useGSAP } from "@gsap/react";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Navbar from "@/components/navbar/navbar";
 import JaLogo from "@/components/ja-logo";
+import { Logo } from "@/components/Logo";
 
 interface HomeSectionProps {
   data: BannerType[];
