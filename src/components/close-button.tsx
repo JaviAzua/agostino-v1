@@ -9,7 +9,7 @@ const CloseButton = ({
   return (
     <button
       onClick={() => setIsOpen(false)}
-      aria-label="Close menu"
+      aria-label="Cerrar modal"
       className="close-btn"
       type="button"
     >

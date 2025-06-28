@@ -1,6 +1,6 @@
 "use client";
 
-import type React from "react";
+import React from "react";
 
 import { useRef, useState, useEffect } from "react";
 import Player from "@vimeo/player";
@@ -15,20 +15,30 @@ import {
   Minimize2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface VideoPlayerVimeoProps {
   vimeoUrl: string;
   title?: string;
   autoplay?: boolean;
-  shouldScale?: boolean;
+  shouldScaleUp?: boolean;
+  shouldScaleDown?: boolean;
+  className?: string;
+  showControls?: boolean;
+  playOnHover?: boolean;
 }
 
-const VideoPlayerVimeo = ({
-  vimeoUrl,
-  autoplay = true,
-  shouldScale = true,
-}: VideoPlayerVimeoProps) => {
-  const playerContainerRef = useRef<HTMLDivElement>(null);
+const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
+  const {
+    vimeoUrl,
+    autoplay = true,
+    shouldScaleUp = true,
+    className,
+    shouldScaleDown = false,
+    showControls,
+    playOnHover = false,
+  } = props;
+  const playerContainerRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
   const volumeSliderRef = useRef<HTMLInputElement>(null);
@@ -39,7 +49,7 @@ const VideoPlayerVimeo = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   /*   const [isVideoLoading, setIsVideoLoading] = useState(true); */
   const [volume, setVolume] = useState(0);
-  const [showControls, setShowControls] = useState(true);
+  const [showControlsState, setShowControls] = useState(true);
 
   const vimeoId = vimeoUrl ? Number(vimeoUrl.split("/").pop()) : undefined;
 
@@ -58,27 +68,6 @@ const VideoPlayerVimeo = ({
         ease: "power3.out",
         delay: 0.8,
       });
-
-      // Subtle hover effect
-      const videoElement = playerContainerRef.current;
-
-      if (shouldScale) {
-        videoElement.addEventListener("mouseenter", () => {
-          gsap.to(videoElement, {
-            scale: 1.02,
-            duration: 0.4,
-            ease: "power2.out",
-          });
-        });
-
-        videoElement.addEventListener("mouseleave", () => {
-          gsap.to(videoElement, {
-            scale: 1,
-            duration: 0.4,
-            ease: "power2.out",
-          });
-        });
-      }
     }
 
     // Animate controls on mount
@@ -218,7 +207,6 @@ const VideoPlayerVimeo = ({
         if (volumeSliderRef.current) {
           gsap.to(volumeSliderRef.current, {
             scaleX: 1,
-            duration: 0.3,
             ease: "back.out(1.7)",
           });
         }
@@ -292,6 +280,7 @@ const VideoPlayerVimeo = ({
 
   // Auto-hide controls
   useEffect(() => {
+    if (showControls !== undefined) return;
     let timeout: NodeJS.Timeout;
 
     const handleMouseMove = () => {
@@ -321,19 +310,23 @@ const VideoPlayerVimeo = ({
       }
       clearTimeout(timeout);
     };
-  }, []);
+  }, [showControls]);
+
+  // Determinar visibilidad de controles
+  const controlsVisible =
+    showControls !== undefined ? showControls : showControlsState;
 
   // Animate controls visibility
   useEffect(() => {
     if (controlsRef.current) {
       gsap.to(controlsRef.current, {
-        autoAlpha: showControls ? 1 : 0,
-        y: showControls ? 0 : 20,
+        autoAlpha: controlsVisible ? 1 : 0,
+        y: controlsVisible ? 0 : 20,
         duration: 0.3,
         ease: "power2.out",
       });
     }
-  }, [showControls]);
+  }, [controlsVisible]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -365,99 +358,122 @@ const VideoPlayerVimeo = ({
 
   const buttonColor = "text-white hover:bg-white/20";
 
+  // GSAP scale animation handlers
+  let scale = 1;
+  if (shouldScaleDown) scale = 0.995;
+  else if (shouldScaleUp) scale = 1.005;
+  const handleScaleEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const isTouch =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    if (isTouch || scale === 1) return;
+    gsap.to(e.currentTarget, { scale, duration: 0.1, ease: "power2.out" });
+    if (playOnHover && playerRef.current) {
+      playerRef.current.play();
+    }
+  };
+  const handleScaleLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const isTouch =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    if (isTouch || scale === 1) return;
+    gsap.to(e.currentTarget, { scale: 1 });
+    if (playOnHover && playerRef.current) {
+      playerRef.current.pause();
+    }
+  };
+
   return (
     <div
-      ref={playerContainerRef}
-      className="relative mx-auto w-full aspect-video overflow-hidden shadow-2xl"
+      aria-label="Video player"
+      role="video"
+      className={cn(
+        "relative mx-auto w-full aspect-video shadow-2xl transition-all duration-300 cursor-none select-none",
+        className
+      )}
     >
-      {/*  {isVideoLoading && (
-        <div
-          ref={loadingRef}
-          className={`absolute inset-0 flex items-center justify-center z-20 backdrop-blur-sm text-honeydew bg-night/50`}
-        >
-          <div className="flex flex-col items-center gap-4">
-            <svg
-              className="loading-spinner h-12 w-12"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              />
-            </svg>
-            <p className="text-sm font-medium">Loading video...</p>
-          </div>
-        </div>
-      )} */}
-
       <div
-        ref={controlsRef}
-        className="cursor-none absolute bottom-4 right-4 flex gap-2 z-10 items-center bg-black/20 backdrop-blur-md rounded-full px-3 py-2 pointer-events-auto"
+        ref={playerContainerRef}
+        onMouseEnter={handleScaleEnter}
+        onMouseLeave={handleScaleLeave}
+        className={cn(
+          "w-full h-full transition-transform duration-300", // ensure smooth scaling
+          shouldScaleDown
+            ? "hover:scale-75"
+            : shouldScaleUp
+            ? "hover:scale-110"
+            : undefined
+        )}
+        style={{ height: "100%" }}
       >
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={togglePlayPause}
-          className={`${buttonColor} hover:scale-110 transition-transform`}
-          aria-label={isPlaying ? "Pause video" : "Play video"}
+        {/* Vimeo iframe will be injected here by Player */}
+        {/* Controls */}
+        <div
+          ref={controlsRef}
+          id="controls"
+          aria-label="Video controls"
+          className="cursor-none absolute bottom-4 right-4 flex gap-2 z-10 items-center bg-black/20 backdrop-blur-md rounded-full px-3 py-2"
+          style={{
+            pointerEvents: controlsVisible ? "auto" : "none",
+            display: controlsVisible ? "flex" : "none",
+          }}
         >
-          {isPlaying ? (
-            <Pause className="h-5 w-5" />
-          ) : (
-            <Play className="h-5 w-5" />
-          )}
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={togglePlayPause}
+            className={`${buttonColor} hover:scale-110 transition-transform`}
+            aria-label={isPlaying ? "Pause video" : "Play video"}
+          >
+            {isPlaying ? (
+              <Pause className="h-5 w-5" />
+            ) : (
+              <Play className="h-5 w-5" />
+            )}
+          </Button>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleMute}
-          className={`${buttonColor} hover:scale-110 transition-transform`}
-          aria-label={isMuted ? "Unmute video" : "Mute video"}
-        >
-          {isMuted ? (
-            <VolumeX className="h-5 w-5" />
-          ) : (
-            <Volume2 className="h-5 w-5" />
-          )}
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleMute}
+            className={`${buttonColor} hover:scale-110 transition-transform`}
+            aria-label={isMuted ? "Unmute video" : "Mute video"}
+          >
+            {isMuted ? (
+              <VolumeX className="h-5 w-5" />
+            ) : (
+              <Volume2 className="h-5 w-5" />
+            )}
+          </Button>
 
-        <input
-          ref={volumeSliderRef}
-          type="range"
-          min={0}
-          max={100}
-          step={1}
-          value={Math.round(volume * 100)}
-          onChange={handleVolumeChange}
-          className="w-20 h-2 accent-persian_orange bg-white/30 rounded-lg appearance-none"
-          aria-label="Volume"
-        />
+          <input
+            ref={volumeSliderRef}
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={Math.round(volume * 100)}
+            onChange={handleVolumeChange}
+            className="w-20 h-2 accent-persian_orange bg-white/30 rounded-lg appearance-none"
+            aria-label="Volume"
+          />
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleFullscreen}
-          className={`${buttonColor} hover:scale-110 transition-transform`}
-          aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen video"}
-        >
-          {isFullscreen ? (
-            <Minimize2 className="h-5 w-5" />
-          ) : (
-            <Maximize2 className="h-5 w-5" />
-          )}
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleFullscreen}
+            className={`${buttonColor} hover:scale-110 transition-transform`}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen video"}
+          >
+            {isFullscreen ? (
+              <Minimize2 className="h-5 w-5" />
+            ) : (
+              <Maximize2 className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

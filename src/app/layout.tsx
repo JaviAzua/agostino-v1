@@ -7,13 +7,14 @@ import { client } from "@/sanity/client";
 import { AboutType, BannerType, ReviewsType, VideoGridType } from "@/types";
 import { HOMEPAGE_QUERY } from "@/lib/queries";
 import HomeSection from "@/components/sections/HomeSection";
-import VideoGridSection from "@/components/sections/VideoGridSection";
+import WorkSection from "@/components/sections/WorkSection";
 import AboutSection from "@/components/sections/AboutSection";
 import ContactSection from "@/components/sections/ContactSection";
 
 import "@fontsource-variable/dm-sans/index.css";
 import "@fontsource-variable/darker-grotesque";
 import CustomCursor from "@/components/cursor/custom-cursor";
+import TopNavbar from "@/components/top-navbar/top-navbar";
 
 export const metadata: Metadata = {
   title: "Gonzalo Agostino | Professional Video Editor",
@@ -119,7 +120,8 @@ export default async function RootLayout({
         <CustomCursor>
           <main>
             <HomeSection data={banner} />
-            <VideoGridSection data={videoGrid} />
+            <TopNavbar />
+            <WorkSection data={videoGrid} />
             <AboutSection /* data={about} isNight={isNight} */ />
             <ContactSection /* data={reviews} isNight={isNight}  */ />
             {children}

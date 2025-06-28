@@ -1,0 +1,30 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Navbar > snapshot inicial es rápido y estable 1`] = `
+<DocumentFragment>
+  <button
+    aria-expanded="false"
+    aria-label="Open menu"
+    class="z-[99] flex gap-1 justify-center items-center hover:scale-[0.9] hover:text-persian_orange transition-colors duration-300"
+  >
+    <p
+      class="text-current text-sm"
+    >
+      MENU
+    </p>
+    <div
+      class="flex flex-col gap-1.5 w-12 h-12 md:w-10 md:h-10 lg:w-9 lg:h-9 justify-center items-center bg-transparent border-none outline-none"
+    >
+      <span
+        class="block w-8 h-0.5 rounded-full bg-current bg-current"
+      />
+      <span
+        class="block w-8 h-0.5 rounded-full bg-current bg-current"
+      />
+      <span
+        class="block w-8 h-0.5 rounded-full bg-current"
+      />
+    </div>
+  </button>
+</DocumentFragment>
+`;

@@ -1,5 +1,5 @@
 "use client";
-import type React from "react";
+import React from "react";
 import {
   useEffect,
   useRef,
@@ -7,7 +7,10 @@ import {
   createContext,
   useContext,
   type JSX,
+  useCallback,
+  useMemo,
 } from "react";
+import { isMobile } from "./cursor-utils";
 
 type CursorVariant = "circle" | "arrow" | string;
 type CursorContextType = {
@@ -62,25 +65,19 @@ const CursorSVGs: Record<CursorVariant, JSX.Element> = {
   ),
 };
 
-const isMobile = () => {
-  if (typeof window === "undefined") return false;
-  return (
-    window.innerWidth < 768 ||
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0
-  );
-};
-
 const CustomCursor: React.FC<{ children?: React.ReactNode }> = ({
   children,
 }) => {
   const [showCursor, setShowCursor] = useState(false);
-  const [variant, setVariant] = useState<CursorVariant>("circle");
+  const [variant, setVariantState] = useState<CursorVariant>("circle");
   const cursorRef = useRef<HTMLDivElement>(null);
 
   const mouse = useRef({ x: 0, y: 0 });
 
   const requestRef = useRef<number>(0);
+
+  const setVariant = useCallback((v: CursorVariant) => setVariantState(v), []);
+  const contextValue = useMemo(() => ({ setVariant }), [setVariant]);
 
   useEffect(() => {
     setShowCursor(!isMobile());
@@ -116,7 +113,7 @@ const CustomCursor: React.FC<{ children?: React.ReactNode }> = ({
   }
 
   return (
-    <CursorContext.Provider value={{ setVariant }}>
+    <CursorContext.Provider value={contextValue}>
       {children}
       <div
         ref={cursorRef}

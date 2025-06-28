@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import VideoPlayerVimeo from "@/components/video-player-vimeo";
 import type { BannerType } from "@/types";
 import { useGSAP } from "@gsap/react";
@@ -17,17 +18,14 @@ export default function HomeSection({ data }: HomeSectionProps) {
   const vimeoUrl = data[0]?.url;
   const scopeRef = useRef(null);
   const [isFooterHidden, setIsFooterHidden] = useState(false);
-  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY.current) {
-        setIsFooterHidden(true);
-      } else {
+      if (window.scrollY === 0) {
         setIsFooterHidden(false);
+      } else {
+        setIsFooterHidden(true);
       }
-      lastScrollY.current = currentScrollY;
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -51,13 +49,13 @@ export default function HomeSection({ data }: HomeSectionProps) {
       mainTl.fromTo(
         logoContainerElement,
         { autoAlpha: 0 },
-        { autoAlpha: 1, duration: 1 }
+        { autoAlpha: 1, duration: 1.5 }
       );
       mainTl.fromTo(
         footerElement,
         { autoAlpha: 0, y: 50 },
         { autoAlpha: 1, y: 0, duration: 0.8 },
-        "+=0.2"
+        "-=0.5"
       );
       mainTl.fromTo(
         videoContainerElement,
@@ -87,27 +85,30 @@ export default function HomeSection({ data }: HomeSectionProps) {
         });
       });
 
-      const triangleElement = gsap.utils.selector(scopeRef)(".triangle");
+      const lineElement = gsap.utils.selector(scopeRef)(".line");
       const tl = gsap.timeline({
         yoyo: true,
         repeat: -1,
       });
 
-      tl.to(triangleElement, { height: "40px", duration: 2.4 })
-        .to(triangleElement, { height: "60px", duration: 0.8 })
-        .to(triangleElement, { height: "40px", duration: 0.8 });
+      tl.to(lineElement, { height: "40px", duration: 2.4 })
+        .to(lineElement, { height: "60px", duration: 0.8 })
+        .to(lineElement, { height: "40px", duration: 0.8 });
     },
 
     { scope: scopeRef }
   );
 
   return (
-    <div
+    <section
       ref={scopeRef}
+      id="home"
       className="relative flex flex-col h-dvh w-full bg-night"
+      role="region"
+      aria-label="Home section"
     >
       <div className="w-full p-6 z-0 logo-container">
-        <Logo className="w-full h-auto" />
+        <Logo className="w-full h-auto" role="img" aria-label="Logo" />
       </div>
       <div className="absolute inset-0 flex items-center justify-center z-10">
         {vimeoUrl && (
@@ -121,16 +122,22 @@ export default function HomeSection({ data }: HomeSectionProps) {
         className={`w-full absolute bottom-0 flex z-20 footer-element text-honeydew ${
           isFooterHidden && "hidden"
         }`}
+        role="contentinfo"
+        aria-label="Footer"
       >
         <JaLogo className="flex-1" />
         <div
-          id="triangle"
-          className="w-[2px] bg-current absolute bottom-0 left-1/2 -translate-x-1/2 triangle h-[20px]"
+          id="line"
+          className="w-[2px] bg-current absolute bottom-0 left-1/2 -translate-x-1/2 line h-[20px]"
         ></div>
-        <div className="pb-2 flex-1 flex justify-end px-4">
+        <div
+          className="pb-2 flex-1 flex justify-end px-4"
+          role="navigation"
+          aria-label="Main navigation"
+        >
           <Navbar />
         </div>
       </footer>
-    </div>
+    </section>
   );
 }
