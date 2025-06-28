@@ -11,16 +11,24 @@ export default function VisualOverlayFooter() {
         className="flex-1 flex flex-wrap justify-evenly lg:flex-initial space-x-2 lg:space-x-4 text-sm md:text-base lg:text-lg  "
       >
         <li className="hover:scale-[0.9]">
-          <Link href="/">Contact</Link>
+          <Link target="_blank" href="/">
+            Contact
+          </Link>
         </li>
         <li className="hover:scale-[0.9]">
-          <Link href="/">Vimeo</Link>
+          <Link target="_blank" href="/">
+            Vimeo
+          </Link>
         </li>
         <li className="hover:scale-[0.9]">
-          <Link href="/">Upwork</Link>
+          <Link target="_blank" href="/">
+            Upwork
+          </Link>
         </li>
         <li className="hover:scale-[0.9]">
-          <Link href="/">Instagram</Link>
+          <Link target="_blank" href="/">
+            Instagram
+          </Link>
         </li>
       </ul>
       <div className="flex-1"></div>
