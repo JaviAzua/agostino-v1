@@ -155,18 +155,20 @@ describe("VideoPlayerVimeo (TDD)", () => {
     expect(screen.getByLabelText(/volume/i)).toBeInTheDocument();
   });
 
-  it("allows clicking play/pause", () => {
+  it("allows clicking play/pause", async () => {
     getPausedMock.mockResolvedValue(true);
     render(<VideoPlayerVimeo vimeoUrl={vimeoUrl} showControls={true} />);
     const playPauseBtn = screen.getByLabelText(/play video|pause video/i);
+    await waitFor(() => expect(playPauseBtn).toBeInTheDocument());
     fireEvent.click(playPauseBtn);
     expect(playPauseBtn).toBeInTheDocument();
   });
 
-  it("allows clicking mute/unmute", () => {
+  it("allows clicking mute/unmute", async () => {
     getVolumeMock.mockResolvedValue(0);
     render(<VideoPlayerVimeo vimeoUrl={vimeoUrl} showControls={true} />);
     const muteBtn = screen.getByLabelText(/mute video|unmute video/i);
+    await waitFor(() => expect(muteBtn).toBeInTheDocument());
     fireEvent.click(muteBtn);
     expect(muteBtn).toBeInTheDocument();
   });

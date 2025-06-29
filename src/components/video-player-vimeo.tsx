@@ -187,22 +187,28 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
 
   const togglePlayPause = (e: React.MouseEvent<HTMLButtonElement>) => {
     animateButton(e.currentTarget);
-    if (!playerRef.current) return;
-    playerRef.current.getPaused().then((paused: boolean) => {
+    if (!playerRef.current || typeof playerRef.current.getPaused !== "function")
+      return;
+    const pausedPromise = playerRef.current.getPaused();
+    if (!pausedPromise || typeof pausedPromise.then !== "function") return;
+    pausedPromise.then((paused: boolean) => {
       if (paused) {
-        playerRef.current?.play();
+        playerRef.current?.play?.();
       } else {
-        playerRef.current?.pause();
+        playerRef.current?.pause?.();
       }
     });
   };
 
   const toggleMute = (e: React.MouseEvent<HTMLButtonElement>) => {
     animateButton(e.currentTarget);
-    if (!playerRef.current) return;
-    playerRef.current.getVolume().then((vol: number) => {
+    if (!playerRef.current || typeof playerRef.current.getVolume !== "function")
+      return;
+    const volumePromise = playerRef.current.getVolume();
+    if (!volumePromise || typeof volumePromise.then !== "function") return;
+    volumePromise.then((vol: number) => {
       if (vol === 0) {
-        playerRef.current?.setVolume(0.4);
+        playerRef.current?.setVolume?.(0.4);
         // Animate volume slider in
         if (volumeSliderRef.current) {
           gsap.to(volumeSliderRef.current, {
@@ -211,7 +217,7 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
           });
         }
       } else {
-        playerRef.current?.setVolume(0);
+        playerRef.current?.setVolume?.(0);
         // Animate volume slider out
         if (volumeSliderRef.current) {
           gsap.to(volumeSliderRef.current, {

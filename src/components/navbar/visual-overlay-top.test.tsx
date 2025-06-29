@@ -7,11 +7,13 @@ import { vi } from "vitest";
 vi.mock("../Logo", () => ({ Logo: () => <svg data-testid="logo" /> }));
 vi.mock("../left-text", () => ({
   __esModule: true,
-  default: (props: any) => <div data-testid="left-text" {...props} />,
+  default: (props: { className?: string }) => (
+    <div data-testid="left-text" {...props} />
+  ),
 }));
 vi.mock("../close-button", () => ({
   __esModule: true,
-  default: ({ setIsOpen }: any) => (
+  default: ({ setIsOpen }: { setIsOpen: (isOpen: boolean) => void }) => (
     <button data-testid="close-btn" onClick={() => setIsOpen(false)}>
       Close
     </button>
