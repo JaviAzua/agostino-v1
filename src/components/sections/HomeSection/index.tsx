@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
-import VideoPlayerVimeo from "@/components/video-player-vimeo";
+import VideoPlayerVimeo, {
+  VideoPlayerVimeoHandle,
+} from "@/components/video-player-vimeo";
 import type { BannerType } from "@/types";
 import { useGSAP } from "@gsap/react";
 import { useEffect, useRef, useState } from "react";
@@ -14,9 +16,10 @@ interface HomeSectionProps {
   data: BannerType[];
 }
 
-export default function HomeSection({ data }: HomeSectionProps) {
+export default function HomeSectionClient({ data }: HomeSectionProps) {
   const vimeoUrl = data[0]?.url;
   const scopeRef = useRef(null);
+  const videoRef = useRef<VideoPlayerVimeoHandle | null>(null);
   const [isFooterHidden, setIsFooterHidden] = useState(false);
 
   useEffect(() => {
@@ -99,6 +102,23 @@ export default function HomeSection({ data }: HomeSectionProps) {
     { scope: scopeRef }
   );
 
+  useEffect(() => {
+    const player = videoRef.current?.getPlayer();
+    if (player) {
+      const handleLoaded = () => {
+        player.setVolume(0).then(() => {
+          player.play().catch(() => {
+            // Puede fallar si el navegador bloquea autoplay
+          });
+        });
+      };
+      player.on("loaded", handleLoaded);
+      return () => {
+        player.off("loaded", handleLoaded);
+      };
+    }
+  }, [vimeoUrl]);
+
   return (
     <section
       ref={scopeRef}
@@ -113,7 +133,18 @@ export default function HomeSection({ data }: HomeSectionProps) {
       <div className="absolute inset-0 flex items-center justify-center z-10">
         {vimeoUrl && (
           <div className="video-container w-full max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 2xl:max-w-[50vw]">
-            <VideoPlayerVimeo vimeoUrl={vimeoUrl} title="Home Video" />
+            <VideoPlayerVimeo
+              ref={videoRef}
+              vimeoUrl={vimeoUrl}
+              key={vimeoUrl}
+              title="Home Video"
+              autoplay={true}
+              playOnHover={false}
+              showControls={true}
+              shouldScaleUp={false}
+              shouldScaleDown={false}
+              className="w-full h-full object-cover"
+            />
           </div>
         )}
       </div>
@@ -135,7 +166,7 @@ export default function HomeSection({ data }: HomeSectionProps) {
           role="navigation"
           aria-label="Main navigation"
         >
-          <Navbar />
+          <Navbar className="hover:text-persian_orange" />
         </div>
       </footer>
     </section>

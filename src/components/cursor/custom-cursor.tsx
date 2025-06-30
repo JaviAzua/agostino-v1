@@ -79,6 +79,14 @@ const CustomCursor: React.FC<{ children?: React.ReactNode }> = ({
   const setVariant = useCallback((v: CursorVariant) => setVariantState(v), []);
   const contextValue = useMemo(() => ({ setVariant }), [setVariant]);
 
+  // Ciclo de vida logs
+  useEffect(() => {
+    console.log("[CustomCursor] MOUNT");
+    return () => {
+      console.log("[CustomCursor] UNMOUNT");
+    };
+  }, []);
+
   useEffect(() => {
     setShowCursor(!isMobile());
   }, []);
@@ -92,12 +100,10 @@ const CustomCursor: React.FC<{ children?: React.ReactNode }> = ({
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate(${mouse.current.x}px, ${mouse.current.y}px) translate(-50%, -50%)`;
       }
-
       requestRef.current = requestAnimationFrame(animateCursor);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-
     requestRef.current = requestAnimationFrame(animateCursor);
 
     return () => {
@@ -106,7 +112,7 @@ const CustomCursor: React.FC<{ children?: React.ReactNode }> = ({
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, []);
+  }, []); // Solo al montar/desmontar
 
   if (!showCursor) {
     return <>{children}</>;

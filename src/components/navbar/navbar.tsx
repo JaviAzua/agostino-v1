@@ -4,8 +4,9 @@ import React from "react";
 import { useState, useRef, useEffect } from "react";
 import VisualOverlayPortal from "./visual-overlay-portal";
 import VisualOverlay from "./visual-overlay";
+import { cn } from "@/lib/utils";
 
-export default function Navbar() {
+export default function Navbar({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -58,7 +59,10 @@ export default function Navbar() {
         onClick={() => toggleMenu()}
         aria-label={isOpen ? "Close menu" : "Open menu"}
         aria-expanded={isOpen}
-        className="z-[99] flex gap-1 justify-center items-center hover:scale-[0.9] hover:text-persian_orange transition-colors duration-300"
+        className={cn(
+          "z-[99] flex gap-1 justify-center items-center hover:scale-[0.9] transition-colors duration-300",
+          className
+        )}
       >
         <p className="text-current text-sm">MENU</p>
         <div className="flex flex-col gap-1.5 w-12 h-12 md:w-10 md:h-10 lg:w-9 lg:h-9 justify-center items-center bg-transparent border-none outline-none">

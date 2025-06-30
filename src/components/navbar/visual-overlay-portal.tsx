@@ -76,7 +76,7 @@ const VisualOverlayPortal: React.FC<MenuOverlayProps> = ({
   return ReactDOM.createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 flex flex-col items-center justify-center z-[99] bg-honeydew"
+      className="fixed inset-0 flex flex-col items-center justify-center z-[99] bg-honeydew text-night"
       onClick={onClick}
       role="dialog"
       aria-modal="true"

@@ -1,8 +1,12 @@
 "use client";
 
-import React from "react";
-
-import { useRef, useState, useEffect } from "react";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import Player from "@vimeo/player";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -26,9 +30,20 @@ interface VideoPlayerVimeoProps {
   className?: string;
   showControls?: boolean;
   playOnHover?: boolean;
+  onReady?: () => void;
 }
 
-const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
+export interface VideoPlayerVimeoHandle {
+  play: () => void;
+  pause: () => void;
+  setVolume: (v: number) => void;
+  getPlayer: () => Player | null;
+}
+
+const VideoPlayerVimeo = forwardRef<
+  VideoPlayerVimeoHandle,
+  VideoPlayerVimeoProps
+>((props, ref) => {
   const {
     vimeoUrl,
     autoplay = true,
@@ -37,69 +52,35 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
     shouldScaleDown = false,
     showControls,
     playOnHover = false,
+    onReady,
   } = props;
   const playerContainerRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
-  const loadingRef = useRef<HTMLDivElement>(null);
   const volumeSliderRef = useRef<HTMLInputElement>(null);
   const playerRef = useRef<Player | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  /*   const [isVideoLoading, setIsVideoLoading] = useState(true); */
   const [volume, setVolume] = useState(0);
   const [showControlsState, setShowControls] = useState(true);
 
   const vimeoId = vimeoUrl ? Number(vimeoUrl.split("/").pop()) : undefined;
 
   useGSAP(() => {
-    // Animate video container entrance
-    if (playerContainerRef.current) {
-      gsap.set(playerContainerRef.current, {
-        autoAlpha: 0,
-        y: 30,
-      });
-
-      gsap.to(playerContainerRef.current, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 1.2,
-        ease: "power3.out",
-        delay: 0.8,
-      });
-    }
-
-    // Animate controls on mount
+    // Solo animar la entrada de los controles al montar
     if (controlsRef.current) {
-      gsap.set(controlsRef.current, {
-        y: 50,
-        autoAlpha: 0,
-      });
-
-      gsap.to(controlsRef.current, {
-        y: 0,
-        autoAlpha: 1,
-        duration: 0.8,
-        ease: "power3.out",
-        delay: 1.5,
-      });
+      gsap.fromTo(
+        controlsRef.current,
+        { autoAlpha: 0 },
+        {
+          autoAlpha: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          delay: 1.5,
+        }
+      );
     }
-
-    // Loading animation
-    if (loadingRef.current) {
-      const spinner = loadingRef.current.querySelector(".loading-spinner");
-      if (spinner) {
-        gsap.to(spinner, {
-          rotation: 360,
-          duration: 1,
-          repeat: -1,
-          ease: "none",
-        });
-      }
-    }
-
-    // Volume slider initial state
+    // El slider de volumen inicia oculto
     if (volumeSliderRef.current) {
       gsap.set(volumeSliderRef.current, {
         scaleX: 0,
@@ -115,7 +96,7 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
 
     const player = new Player(playerContainerRef.current, {
       id: vimeoId,
-      autoplay: autoplay,
+      autoplay: false, // autoplay se controla por separado
       muted: true,
       controls: false,
       responsive: true,
@@ -123,28 +104,13 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
       loop: true,
     });
     playerRef.current = player;
-    /* setIsVideoLoading(true); */
 
     player.on("loaded", () => {
-      /*  setIsVideoLoading(false); */
-
-      // Animate loading out and video in
-      if (loadingRef.current) {
-        gsap.to(loadingRef.current, {
-          autoAlpha: 0,
-          duration: 0.5,
-          ease: "power2.in",
-        });
-      }
-
-      // Animate video fade in when loaded
       const iframe = playerContainerRef.current?.querySelector("iframe");
       if (iframe) {
         gsap.fromTo(
           iframe,
-          {
-            autoAlpha: 0,
-          },
+          { autoAlpha: 0 },
           {
             autoAlpha: 1,
             duration: 1,
@@ -154,44 +120,41 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
           }
         );
       }
-
       player.setVolume(0).then(() => {
         setVolume(0);
-        setIsMuted(true);
       });
       player.getPaused().then((paused: boolean) => setIsPlaying(!paused));
+      if (onReady) onReady();
     });
 
     player.on("play", () => setIsPlaying(true));
     player.on("pause", () => setIsPlaying(false));
     player.on("volumechange", (data: { volume: number }) => {
       setVolume(data.volume);
-      setIsMuted(data.volume === 0);
     });
 
     return () => {
       player.unload();
+      playerRef.current = null;
     };
-  }, [vimeoId, autoplay]);
+  }, [vimeoId, vimeoUrl, onReady]);
 
-  // Enhanced button animations
-  const animateButton = (element: HTMLElement, scale = 1.15) => {
-    gsap.to(element, {
-      scale,
-      duration: 0.1,
-      ease: "power2.out",
-      yoyo: true,
-      repeat: 1,
+  // Controlar autoplay dinámicamente
+  useEffect(() => {
+    if (!playerRef.current) return;
+    playerRef.current.getPaused().then((paused: boolean) => {
+      if (autoplay && paused) {
+        playerRef.current?.play?.();
+      } else if (!autoplay && !paused) {
+        playerRef.current?.pause?.();
+      }
     });
-  };
+  }, [autoplay]);
 
-  const togglePlayPause = (e: React.MouseEvent<HTMLButtonElement>) => {
-    animateButton(e.currentTarget);
-    if (!playerRef.current || typeof playerRef.current.getPaused !== "function")
-      return;
-    const pausedPromise = playerRef.current.getPaused();
-    if (!pausedPromise || typeof pausedPromise.then !== "function") return;
-    pausedPromise.then((paused: boolean) => {
+  // Centralizar play/pause
+  const handlePlayPause = () => {
+    if (!playerRef.current) return;
+    playerRef.current.getPaused().then((paused: boolean) => {
       if (paused) {
         playerRef.current?.play?.();
       } else {
@@ -200,34 +163,27 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
     });
   };
 
-  const toggleMute = (e: React.MouseEvent<HTMLButtonElement>) => {
-    animateButton(e.currentTarget);
-    if (!playerRef.current || typeof playerRef.current.getVolume !== "function")
-      return;
-    const volumePromise = playerRef.current.getVolume();
-    if (!volumePromise || typeof volumePromise.then !== "function") return;
-    volumePromise.then((vol: number) => {
-      if (vol === 0) {
-        playerRef.current?.setVolume?.(0.4);
-        // Animate volume slider in
-        if (volumeSliderRef.current) {
-          gsap.to(volumeSliderRef.current, {
-            scaleX: 1,
-            ease: "back.out(1.7)",
-          });
-        }
-      } else {
-        playerRef.current?.setVolume?.(0);
-        // Animate volume slider out
-        if (volumeSliderRef.current) {
-          gsap.to(volumeSliderRef.current, {
-            scaleX: 0,
-            duration: 0.2,
-            ease: "power2.in",
-          });
-        }
+  // Centralizar mute/unmute y animación del slider
+  const handleMute = () => {
+    if (!playerRef.current) return;
+    if (volume === 0) {
+      playerRef.current.setVolume(0.4);
+      if (volumeSliderRef.current) {
+        gsap.to(volumeSliderRef.current, {
+          scaleX: 1,
+          ease: "back.out(1.7)",
+        });
       }
-    });
+    } else {
+      playerRef.current.setVolume(0);
+      if (volumeSliderRef.current) {
+        gsap.to(volumeSliderRef.current, {
+          scaleX: 0,
+          duration: 0.2,
+          ease: "power2.in",
+        });
+      }
+    }
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -236,10 +192,17 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
     if (playerRef.current) {
       playerRef.current.setVolume(newVolume);
     }
+    // Mostrar el slider si el volumen es mayor a 0
+    if (volumeSliderRef.current) {
+      gsap.to(volumeSliderRef.current, {
+        scaleX: newVolume > 0 ? 1 : 0,
+        duration: 0.2,
+        ease: newVolume > 0 ? "back.out(1.7)" : "power2.in",
+      });
+    }
   };
 
-  const handleFullscreen = (e: React.MouseEvent<HTMLButtonElement>) => {
-    animateButton(e.currentTarget);
+  const handleFullscreen = () => {
     if (!playerContainerRef.current) return;
     if (isFullscreen) {
       const doc = document as Document & {
@@ -284,11 +247,9 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
     }
   };
 
-  // Auto-hide controls
+  // Visibilidad de controles solo por estado interno
   useEffect(() => {
-    if (showControls !== undefined) return;
     let timeout: NodeJS.Timeout;
-
     const handleMouseMove = () => {
       setShowControls(true);
       clearTimeout(timeout);
@@ -296,14 +257,12 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
         setShowControls(false);
       }, 3000);
     };
-
     const container = playerContainerRef.current;
     if (container) {
       container.addEventListener("mousemove", handleMouseMove);
       container.addEventListener("mouseenter", () => setShowControls(true));
       container.addEventListener("mouseleave", () => setShowControls(false));
     }
-
     return () => {
       if (container) {
         container.removeEventListener("mousemove", handleMouseMove);
@@ -316,18 +275,17 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
       }
       clearTimeout(timeout);
     };
-  }, [showControls]);
+  }, []);
 
-  // Determinar visibilidad de controles
+  // Determinar visibilidad de controles: prop tiene prioridad, si no, estado interno
   const controlsVisible =
     showControls !== undefined ? showControls : showControlsState;
 
-  // Animate controls visibility
+  // Eliminar animación Y en visibilidad, solo opacidad
   useEffect(() => {
     if (controlsRef.current) {
       gsap.to(controlsRef.current, {
         autoAlpha: controlsVisible ? 1 : 0,
-        y: controlsVisible ? 0 : 20,
         duration: 0.3,
         ease: "power2.out",
       });
@@ -362,34 +320,69 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
     };
   }, []);
 
-  const buttonColor = "text-white hover:bg-white/20";
-
-  // GSAP scale animation handlers
-  let scale = 1;
-  if (shouldScaleDown) scale = 0.995;
-  else if (shouldScaleUp) scale = 1.005;
-  const handleScaleEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleScaleEnter = () => {
     const isTouch =
       typeof window !== "undefined" &&
       window.matchMedia &&
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    if (isTouch || scale === 1) return;
-    gsap.to(e.currentTarget, { scale, duration: 0.1, ease: "power2.out" });
-    if (playOnHover && playerRef.current) {
+    if (isTouch) return;
+    if (!playOnHover) return;
+    if (playerRef.current) {
       playerRef.current.play();
     }
   };
-  const handleScaleLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleScaleLeave = () => {
     const isTouch =
       typeof window !== "undefined" &&
       window.matchMedia &&
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    if (isTouch || scale === 1) return;
-    gsap.to(e.currentTarget, { scale: 1 });
-    if (playOnHover && playerRef.current) {
+    if (isTouch) return;
+
+    if (!playOnHover) return;
+    if (playerRef.current) {
       playerRef.current.pause();
     }
   };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      play: () => playerRef.current?.play?.(),
+      pause: () => playerRef.current?.pause?.(),
+      setVolume: (v: number) => playerRef.current?.setVolume?.(v),
+      getPlayer: () => playerRef.current,
+    }),
+    []
+  );
+
+  // 1. Crear un pequeño componente para los botones de control
+  const ControlButton = ({
+    onClick,
+    ariaLabel,
+    children,
+    tabIndex = 0,
+    onKeyDown,
+    className = "",
+  }: {
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    ariaLabel: string;
+    children: React.ReactNode;
+    tabIndex?: number;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLButtonElement>) => void;
+    className?: string;
+  }) => (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
+      className={`text-white hover:bg-white/20 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-persian_orange ${className}`}
+    >
+      {children}
+    </Button>
+  );
 
   return (
     <div
@@ -405,11 +398,11 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
         onMouseEnter={handleScaleEnter}
         onMouseLeave={handleScaleLeave}
         className={cn(
-          "w-full h-full transition-transform duration-300", // ensure smooth scaling
+          "w-full h-full transition-transform duration-100",
           shouldScaleDown
-            ? "hover:scale-75"
+            ? "hover:scale-[0.99]"
             : shouldScaleUp
-            ? "hover:scale-110"
+            ? "hover:scale-[1.01]"
             : undefined
         )}
         style={{ height: "100%" }}
@@ -418,6 +411,7 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
         {/* Controls */}
         <div
           ref={controlsRef}
+          onClick={(e) => e.stopPropagation()}
           id="controls"
           aria-label="Video controls"
           className="cursor-none absolute bottom-4 right-4 flex gap-2 z-10 items-center bg-black/20 backdrop-blur-md rounded-full px-3 py-2"
@@ -426,34 +420,32 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
             display: controlsVisible ? "flex" : "none",
           }}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={togglePlayPause}
-            className={`${buttonColor} hover:scale-110 transition-transform`}
-            aria-label={isPlaying ? "Pause video" : "Play video"}
+          <ControlButton
+            onClick={handlePlayPause}
+            ariaLabel={isPlaying ? "Pause video" : "Play video"}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") handlePlayPause();
+            }}
           >
             {isPlaying ? (
               <Pause className="h-5 w-5" />
             ) : (
               <Play className="h-5 w-5" />
             )}
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleMute}
-            className={`${buttonColor} hover:scale-110 transition-transform`}
-            aria-label={isMuted ? "Unmute video" : "Mute video"}
+          </ControlButton>
+          <ControlButton
+            onClick={handleMute}
+            ariaLabel={volume === 0 ? "Unmute video" : "Mute video"}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") handleMute();
+            }}
           >
-            {isMuted ? (
+            {volume === 0 ? (
               <VolumeX className="h-5 w-5" />
             ) : (
               <Volume2 className="h-5 w-5" />
             )}
-          </Button>
-
+          </ControlButton>
           <input
             ref={volumeSliderRef}
             type="range"
@@ -465,24 +457,25 @@ const VideoPlayerVimeo = (props: VideoPlayerVimeoProps) => {
             className="w-20 h-2 accent-persian_orange bg-white/30 rounded-lg appearance-none"
             aria-label="Volume"
           />
-
-          <Button
-            variant="ghost"
-            size="icon"
+          <ControlButton
             onClick={handleFullscreen}
-            className={`${buttonColor} hover:scale-110 transition-transform`}
-            aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen video"}
+            ariaLabel={isFullscreen ? "Exit fullscreen" : "Fullscreen video"}
+            onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
+              if (e.key === "Enter" || e.key === " ") handleFullscreen();
+            }}
           >
             {isFullscreen ? (
               <Minimize2 className="h-5 w-5" />
             ) : (
               <Maximize2 className="h-5 w-5" />
             )}
-          </Button>
+          </ControlButton>
         </div>
       </div>
     </div>
   );
-};
+});
+
+VideoPlayerVimeo.displayName = "VideoPlayerVimeo";
 
 export default VideoPlayerVimeo;

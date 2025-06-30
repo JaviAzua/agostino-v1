@@ -1,20 +1,10 @@
-export const dynamic = "force-dynamic";
-
 import "./globals.css";
 import { Metadata } from "next";
 import { env } from "../../env";
-import { client } from "@/sanity/client";
-import { AboutType, BannerType, ReviewsType, VideoGridType } from "@/types";
-import { HOMEPAGE_QUERY } from "@/lib/queries";
-import HomeSection from "@/components/sections/HomeSection";
-import WorkSection from "@/components/sections/WorkSection";
-import AboutSection from "@/components/sections/AboutSection";
-import ContactSection from "@/components/sections/ContactSection";
 
 import "@fontsource-variable/dm-sans/index.css";
 import "@fontsource-variable/darker-grotesque";
 import CustomCursor from "@/components/cursor/custom-cursor";
-import TopNavbar from "@/components/top-navbar/top-navbar";
 
 export const metadata: Metadata = {
   title: "Gonzalo Agostino | Professional Video Editor",
@@ -23,8 +13,7 @@ export const metadata: Metadata = {
   keywords: [
     "video editor",
     "professional video editing",
-    "cinematic editing",
-    "post-production",
+    "cinematic",
     "motion graphics",
     "visual storytelling",
     "film editing",
@@ -107,26 +96,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { /*about,reviews, */ videoGrid, banner } = await client.fetch<{
-    videoGrid: VideoGridType[];
-    about: AboutType[];
-    banner: BannerType[];
-    reviews: ReviewsType[];
-  }>(HOMEPAGE_QUERY, {}, { next: { revalidate: 604800 } });
-
   return (
     <html lang="en">
       <body>
-        <CustomCursor>
-          <main>
-            <HomeSection data={banner} />
-            <TopNavbar />
-            <WorkSection data={videoGrid} />
-            <AboutSection /* data={about} isNight={isNight} */ />
-            <ContactSection /* data={reviews} isNight={isNight}  */ />
-            {children}
-          </main>
-        </CustomCursor>
+        <CustomCursor>{children}</CustomCursor>
       </body>
     </html>
   );

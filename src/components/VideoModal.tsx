@@ -1,7 +1,15 @@
-import React, { useEffect } from "react";
+"use client";
+
+import type React from "react";
 import type { VideoGridType } from "@/types";
 import VideoPlayerVimeo from "@/components/video-player-vimeo";
-import CloseButton from "./close-button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface VideoModalProps {
   open: boolean;
@@ -10,51 +18,40 @@ interface VideoModalProps {
 }
 
 const VideoModal: React.FC<VideoModalProps> = ({ open, onClose, video }) => {
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+  if (!video) return null;
 
-  if (!open || !video) return null;
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Video modal"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm "
-      tabIndex={-1}
-      onClick={onClose}
-    >
-      <div
-        className="relative bg-honeydew shadow-xl w-[80vw] max-w-4xl p-6 flex flex-col items-center"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <CloseButton setIsOpen={onClose} />
-        <h2 className="text-2xl font-bold mb-2 text-center w-full">
-          {video.name}
-        </h2>
-        <p className="mb-4 text-center w-full text-gray-700">
-          {video.description}
-        </p>
-        <div className="w-full flex justify-center">
-          <div className="w-full" style={{ maxWidth: "900px" }}>
-            <VideoPlayerVimeo
-              vimeoUrl={video.url}
-              autoplay={true}
-              showControls={true}
-              shouldScaleUp={false}
-              shouldScaleDown={false}
-            />
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <div>
+        <DialogContent
+          id="video-modal"
+          className="bg-honeydew p-2 max-w-[80vw] min-h-[90vh] max-h-[90vh] !rounded-none overflow-y-auto"
+        >
+          <div className="relative flex flex-col justify-evenly">
+            <DialogHeader className="w-full px-10">
+              <DialogTitle className="text-3xl font-dm font-bold text-left w-full text-night">
+                {video.name}
+              </DialogTitle>
+              <DialogDescription className="w-[90%] text-gray-700 font-dm text-pretty">
+                {video.description}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="w-full flex justify-center">
+              <div className="w-full max-w-[80vw] xl:max-w-[70vw] 2xl:max-w-[60vw]">
+                <VideoPlayerVimeo
+                  vimeoUrl={video.url}
+                  autoplay={true}
+                  showControls={true}
+                  playOnHover={false}
+                  shouldScaleUp={false}
+                  shouldScaleDown={false}
+                />
+              </div>
+            </div>
           </div>
-        </div>
+        </DialogContent>
       </div>
-    </div>
+    </Dialog>
   );
 };
 
