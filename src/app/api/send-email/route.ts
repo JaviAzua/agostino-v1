@@ -10,13 +10,13 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-  /* un.totem777@gmail.com */
+
   try {
     const { email, subject, message } = await request.json();
 
     const { data, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
-      to: ["azua.javi@gmail.com"],
+      from: "Gonzalo Agostino website <noreply@gonzaloagostino.com>",
+      to: ["un.totem777@gmail.com"],
       subject: subject,
       text: `
 From: ${email}
