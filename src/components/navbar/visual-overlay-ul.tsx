@@ -1,6 +1,5 @@
 import React from "react";
 import gsap from "gsap";
-// @ts-expect-error: No types for react-scroll
 import { scroller } from "react-scroll";
 
 const MENU = [
