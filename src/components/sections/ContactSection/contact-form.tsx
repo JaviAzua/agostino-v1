@@ -131,7 +131,7 @@ export function ContactForm() {
       transition={{ duration: 0.6 }}
       className="container mx-auto text-honeydew px-4"
     >
-      <h3 className="text-2xl font-semibold mb-8">Contact Us</h3>
+      <h3 className="text-2xl font-semibold mb-8">Contact Me</h3>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -199,7 +199,7 @@ export function ContactForm() {
                 </FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Tell us more about your inquiry..."
+                    placeholder="Tell me..."
                     className={`h-32 bg-gray-700 text-white border-gray-600 focus:border-orangeL text-base transition-all duration-300 ${
                       isSubmitting ? "opacity-60" : ""
                     }`}
