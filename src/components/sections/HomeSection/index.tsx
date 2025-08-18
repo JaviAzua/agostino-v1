@@ -52,7 +52,7 @@ export default function HomeSectionClient({ data }: HomeSectionProps) {
       mainTl.fromTo(
         logoContainerElement,
         { autoAlpha: 0 },
-        { autoAlpha: 1, duration: 1.5 }
+        { autoAlpha: 1, duration: 1.5, delay: 0.3 }
       );
       mainTl.fromTo(
         footerElement,
@@ -107,9 +107,7 @@ export default function HomeSectionClient({ data }: HomeSectionProps) {
     if (player) {
       const handleLoaded = () => {
         player.setVolume(0).then(() => {
-          player.play().catch(() => {
-            // Puede fallar si el navegador bloquea autoplay
-          });
+          player.play().catch(() => {});
         });
       };
       player.on("loaded", handleLoaded);
@@ -142,7 +140,7 @@ export default function HomeSectionClient({ data }: HomeSectionProps) {
               playOnHover={false}
               showControls={true}
               shouldScaleUp={false}
-              shouldScaleDown={false}
+              shouldScaleDown={true}
               className="w-full h-full object-cover"
             />
           </div>

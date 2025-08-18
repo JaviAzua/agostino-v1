@@ -34,7 +34,6 @@ export default function Navbar({ className }: { className?: string }) {
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
-      // No restaurar el overflow aquí, se hace en handleExited
     };
   }, [isOpen]);
 

@@ -5,7 +5,7 @@ import useInView from "@/hooks/useInView";
 import { VideoGridType } from "@/types";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import React, { createRef, RefObject, useRef } from "react";
+import React, { createRef, RefObject, useRef, useState } from "react";
 
 interface WorkVideoFlexProps {
   flexItems: VideoGridType[];
@@ -19,12 +19,13 @@ function WorkVideoFlex({
   handleOpenModal,
 }: WorkVideoFlexProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const isInView = useInView(containerRef as React.RefObject<Element>, {
     threshold: 0.3,
   });
 
   useGSAP(() => {
-    if (isInView) {
+    if (isInView && !hasAnimated) {
       gsap.from(contentRefs.current, {
         autoAlpha: 0,
         y: 100,
@@ -32,6 +33,7 @@ function WorkVideoFlex({
         stagger: 0.1,
         filter: "blur(10px)",
       });
+      setHasAnimated(true);
     }
   }, [isInView]);
 
@@ -64,7 +66,7 @@ function WorkVideoFlex({
           }}
         >
           <div className="relative w-full aspect-video">
-            <span className="absolute bottom-2 left-2 text-gray-800 text-sm font-medium z-20">
+            <span className="absolute bottom-2 left-2 text-2xl font-darker-grotesque font-medium uppercase z-20 text-honeydew group-hover:text-night groupd-hover:scale-[0.99]">
               {item.name}
             </span>
             <VideoPlayerVimeo

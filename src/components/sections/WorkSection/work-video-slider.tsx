@@ -85,7 +85,6 @@ function WorkVideoSlider({
       next[idx] = true;
       return next;
     });
-    console.log(`[WorkVideoSlider] Video ${idx} READY`);
   };
 
   useEffect(() => {
@@ -99,12 +98,10 @@ function WorkVideoSlider({
               if (idx === selectedIndex && inViewStates[idx]) {
                 if (paused) {
                   ref.current?.play?.();
-                  console.log(`[WorkVideoSlider] play() video ${idx}`);
                 }
               } else {
                 if (!paused) {
                   ref.current?.pause?.();
-                  console.log(`[WorkVideoSlider] pause() video ${idx}`);
                 }
               }
             });
@@ -128,7 +125,7 @@ function WorkVideoSlider({
   return (
     <section
       className={cn(
-        "relative h-dvh w-full flex items-center justify-center bg-night text-honeydew",
+        "relative h-dvh w-full flex items-center justify-center text-honeydew z-10",
         className
       )}
     >
@@ -145,7 +142,7 @@ function WorkVideoSlider({
           {items.map((item, index) => (
             <CarouselItem
               key={item._id}
-              className="basis-full h-full flex mt-36 lg:mt-10 justify-center p-4 "
+              className="basis-full h-full flex justify-center p-4 "
             >
               <div
                 ref={(el) => {
@@ -154,7 +151,7 @@ function WorkVideoSlider({
                   }
                   containerRefs.current[index] = el;
                 }}
-                className={`relative w-full max-w-3xl aspect-video`} // Controla el tamaño máximo del video y añade efectos
+                className={`relative w-full max-w-4xl aspect-video flex items-center justify-center`}
                 onClick={() => onOpenModal(item)}
                 tabIndex={0}
                 role="button"
@@ -166,7 +163,7 @@ function WorkVideoSlider({
                 }}
               >
                 <div className="relative w-full aspect-video">
-                  <span className="font-darker-grotesque animate-pulse absolute flex w-full justify-center -bottom-10 text-lg md:text-2xl lg:text-3xl font-medium px-2 py-1 rounded-md">
+                  <span className="font-darker-grotesque absolute flex w-full justify-center -top-16 text-lg md:text-2xl lg:text-3xl font-medium px-2 py-1 rounded-md">
                     {item.name}
                   </span>
                   <VideoPlayerVimeo

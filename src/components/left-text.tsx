@@ -3,7 +3,7 @@ import React from "react";
 
 interface LeftTextProps {
   className?: string;
-  text: string;
+  text?: string;
 }
 
 export default function LeftText({ className, text }: LeftTextProps) {

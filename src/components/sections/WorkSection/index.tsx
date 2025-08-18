@@ -6,6 +6,7 @@ import VideoModal from "@/components/VideoModal";
 import WorkVideoSlider from "./work-video-slider";
 import WorkVideoFlex from "./work-video-flex";
 import WorkVideoReview from "./work-video-review";
+import WorkSectionLogo from "./work-section-logo";
 
 interface WorkSectionProps {
   data: VideoGridType[];
@@ -51,7 +52,7 @@ export default function WorkSectionPage({ data, review }: WorkSectionProps) {
     <section
       id="works"
       aria-label="Works, made by Gonzalo Agostino"
-      className="bg-honeydew min-h-screen"
+      className="bg-honeydew min-h-screen relative"
     >
       <WorkVideoFlex
         flexItems={flexItems}
@@ -60,13 +61,15 @@ export default function WorkSectionPage({ data, review }: WorkSectionProps) {
       />
 
       <WorkVideoReview review={review.review} />
+      <div className="bg-night">
+        <WorkVideoSlider
+          items={sliderItems}
+          contentRefs={contentRefs}
+          onOpenModal={handleOpenModal}
+        />
 
-      <WorkVideoSlider
-        items={sliderItems}
-        contentRefs={contentRefs}
-        onOpenModal={handleOpenModal}
-      />
-
+        <WorkSectionLogo />
+      </div>
       <VideoModal
         open={modalOpen}
         onClose={handleCloseModal}

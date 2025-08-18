@@ -15,8 +15,8 @@ export const useCurrentSectionId = (): string => {
         if (el) {
           const rect = el.getBoundingClientRect();
           if (
-            rect.top <= window.innerHeight / 2 &&
-            rect.bottom >= window.innerHeight / 2
+            rect.top <= window.innerHeight / 1 / 3 &&
+            rect.bottom >= window.innerHeight / 1 / 3
           ) {
             found = id;
             break;

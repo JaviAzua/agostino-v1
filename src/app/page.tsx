@@ -5,12 +5,19 @@ import React from "react";
 import PageClient from "./page-client";
 
 export default async function HomePage() {
-  const { videoGrid, banner, reviews } = await client.fetch<{
+  const { videoGrid, about, banner, reviews } = await client.fetch<{
     videoGrid: VideoGridType[];
     about: AboutType[];
     banner: BannerType[];
     reviews: ReviewsType[];
   }>(HOMEPAGE_QUERY, {}, { next: { revalidate: 604800 } });
 
-  return <PageClient videoGrid={videoGrid} banner={banner} reviews={reviews} />;
+  return (
+    <PageClient
+      videoGrid={videoGrid}
+      banner={banner}
+      reviews={reviews}
+      about={about}
+    />
+  );
 }
