@@ -1,38 +1,23 @@
-import type { AboutT, BannerT, VideoGridT, ReviewsT } from "@/types";
-import ClientMainPage from "@/components/client-main-page";
-import { env } from "../../env";
-import { FaSpinner } from "react-icons/fa";
+import { client } from "@/sanity/client";
+import { AboutType, BannerType, ReviewsType, VideoGridType } from "@/types";
+import { HOMEPAGE_QUERY } from "@/lib/queries";
+import React from "react";
+import PageClient from "./page-client";
 
-interface ApiResponse {
-  bannerImg: BannerT[];
-  videoGrid: VideoGridT[];
-  aboutDB: AboutT[];
-  reviewsDB: ReviewsT[];
-}
+export default async function HomePage() {
+  const { videoGrid, about, banner, reviews } = await client.fetch<{
+    videoGrid: VideoGridType[];
+    about: AboutType[];
+    banner: BannerType[];
+    reviews: ReviewsType[];
+  }>(HOMEPAGE_QUERY, {}, { next: { revalidate: 604800 } });
 
-export default async function Page() {
-  try {
-    const res = await fetch(`${env.BASE_URL}/api/data`, {
-      next: { revalidate: 172800 },
-    });
-    if (!res.ok) throw new Error("API not available");
-
-    const data: ApiResponse = await res.json();
-
-    return (
-      <ClientMainPage
-        bannerImg={data.bannerImg}
-        videoGrid={data.videoGrid}
-        aboutDB={data.aboutDB}
-        reviewsDB={data.reviewsDB}
-      />
-    );
-  } catch (error) {
-    console.error(error);
-    return (
-      <div className="animate-spin">
-        <FaSpinner />
-      </div>
-    );
-  }
+  return (
+    <PageClient
+      videoGrid={videoGrid}
+      banner={banner}
+      reviews={reviews}
+      about={about}
+    />
+  );
 }

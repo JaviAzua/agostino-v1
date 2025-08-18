@@ -1,8 +1,11 @@
 import "./globals.css";
-import { Roboto } from "next/font/google";
 import { Metadata } from "next";
-import { Toaster } from "@/components/ui/toaster";
 import { env } from "../../env";
+
+import "@fontsource-variable/dm-sans/index.css";
+import "@fontsource-variable/darker-grotesque";
+import CustomCursor from "@/components/cursor/custom-cursor";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Gonzalo Agostino | Professional Video Editor",
@@ -11,8 +14,7 @@ export const metadata: Metadata = {
   keywords: [
     "video editor",
     "professional video editing",
-    "cinematic editing",
-    "post-production",
+    "cinematic",
     "motion graphics",
     "visual storytelling",
     "film editing",
@@ -57,13 +59,6 @@ export const metadata: Metadata = {
       type: "image/x-icon",
     },
     {
-      url: "/favicon-dark.ico",
-      media: "(prefers-color-scheme: dark)",
-      rel: "icon",
-      sizes: "48x48",
-      type: "image/x-icon",
-    },
-    {
       url: "/favicon.svg",
       type: "image/svg+xml",
     },
@@ -71,6 +66,12 @@ export const metadata: Metadata = {
       url: "/apple-touch-icon.png",
       sizes: "180x180",
       rel: "apple-touch-icon",
+    },
+
+    {
+      url: "/favicon.ico",
+      sizes: "any",
+      rel: "icon",
     },
   ],
   other: {
@@ -80,8 +81,11 @@ export const metadata: Metadata = {
       name: "Gonzalo Agostino",
       url: env.BASE_URL,
       jobTitle: "Video Editor",
-      image: `${env.BASE_URL}/profile.webp`,
+      image: `${env.BASE_URL}/og-image.jpg`,
     }),
+
+    "link[rel='manifest']": "/site.webmanifest",
+    "meta[name='theme-color']": "#121619",
   },
 };
 
@@ -90,20 +94,15 @@ export const viewport = {
   initialScale: 1,
 };
 
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["100", "300", "400", "500", "700", "900"],
-});
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className={`${roboto.className} bg-blackB text-white`}>
-        {children}
+    <html lang="en">
+      <body>
+        <CustomCursor>{children}</CustomCursor>
         <Toaster />
       </body>
     </html>
